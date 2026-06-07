@@ -1,4 +1,4 @@
-const CACHE_NAME = 'portal-siswa-cache-v1';
+const CACHE_NAME = 'portal-siswa-cache-v2';
 const ASSETS = [
   './',
   './index.html',
@@ -35,21 +35,47 @@ self.addEventListener('activate', (e) => {
 
 self.addEventListener('fetch', (e) => {
   if (e.request.url.startsWith('http')) {
-    e.respondWith(
-      caches.match(e.request).then((cachedResponse) => {
-        if (cachedResponse) {
-          return cachedResponse;
-        }
-        return fetch(e.request).then((response) => {
-          if (response && response.status === 200) {
-            const responseClone = response.clone();
-            caches.open(CACHE_NAME).then((cache) => {
-              cache.put(e.request, responseClone);
-            });
+    const url = new URL(e.request.url);
+    const isHtmlOrManifest = url.pathname.endsWith('index.html') || 
+                             url.pathname === '/' || 
+                             url.pathname.endsWith('/') || 
+                             url.pathname.endsWith('manifest.json');
+
+    if (isHtmlOrManifest) {
+      // Network-First Strategy for HTML/Manifest to get updates instantly
+      e.respondWith(
+        fetch(e.request)
+          .then((response) => {
+            if (response && response.status === 200) {
+              const responseClone = response.clone();
+              caches.open(CACHE_NAME).then((cache) => {
+                cache.put(e.request, responseClone);
+              });
+            }
+            return response;
+          })
+          .catch(() => {
+            return caches.match(e.request);
+          })
+      );
+    } else {
+      // Cache-First Strategy for static libraries and assets
+      e.respondWith(
+        caches.match(e.request).then((cachedResponse) => {
+          if (cachedResponse) {
+            return cachedResponse;
           }
-          return response;
-        });
-      })
-    );
+          return fetch(e.request).then((response) => {
+            if (response && response.status === 200) {
+              const responseClone = response.clone();
+              caches.open(CACHE_NAME).then((cache) => {
+                cache.put(e.request, responseClone);
+              });
+            }
+            return response;
+          });
+        })
+      );
+    }
   }
 });
