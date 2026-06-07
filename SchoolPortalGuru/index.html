@@ -961,26 +961,26 @@ Kunci: A</pre>
           currentQ = {
             no: qMatch[1],
             pertanyaan: qMatch[2],
-            options: { A: "", B: "", C: "", D: "" },
+            options: { A: "", B: "", C: "", D: "", E: "" },
             kunci: ""
           };
           continue;
         }
 
-        const optMatch = line.match(/^([A-D])[\.\)]\s*(.*)/i);
+        const optMatch = line.match(/^([A-E])[\.\)]\s*(.*)/i);
         if (optMatch && currentQ) {
           const optLetter = optMatch[1].toUpperCase();
           currentQ.options[optLetter] = optMatch[2];
           continue;
         }
 
-        const keyMatch = line.match(/^(Kunci|Jawaban|Ans|Key)\s*:\s*([A-D])/i);
+        const keyMatch = line.match(/^(Kunci|Jawaban|Ans|Key)\s*:\s*([A-E])/i);
         if (keyMatch && currentQ) {
           currentQ.kunci = keyMatch[2].toUpperCase();
           continue;
         }
 
-        if (currentQ && !line.match(/^[A-D][\.\)]/i)) {
+        if (currentQ && !line.match(/^[A-E][\.\)]/i)) {
           currentQ.pertanyaan += " " + line;
         }
       }
@@ -994,7 +994,7 @@ Kunci: A</pre>
 
       const missingKey = parsedWordQuestions.filter(q => !q.kunci);
       if (missingKey.length > 0) {
-        alert(`Ujian gagal dibuat! Ada ${missingKey.length} soal yang belum memiliki Kunci Jawaban. Silakan lengkapi dengan baris 'Kunci: A/B/C/D' di file Word Anda.`);
+        alert(`Ujian gagal dibuat! Ada ${missingKey.length} soal yang belum memiliki Kunci Jawaban. Silakan lengkapi dengan baris 'Kunci: A/B/C/D/E' di file Word Anda.`);
         return;
       }
 
