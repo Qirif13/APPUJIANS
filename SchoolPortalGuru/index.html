@@ -392,8 +392,8 @@ Kunci: A</pre>
       const title = localStorage.getItem("cfg_school_title") || "PORTAL HUB SEKOLAH";
       document.getElementById("txtSchoolTitleMain").innerText = "PORTAL GURU - " + title;
 
-      // Set default database terpusat sekolah jika belum ada di penyimpan lokal
-      if (!localStorage.getItem("cfg_sync_mode")) {
+      // Set default database terpusat sekolah jika belum ada di penyimpan lokal atau jika nilainya 'offline'
+      if (!localStorage.getItem("cfg_sync_mode") || localStorage.getItem("cfg_sync_mode") === "offline" || !localStorage.getItem("cfg_supabase_url")) {
         localStorage.setItem("cfg_sync_mode", "hybrid");
         localStorage.setItem("cfg_supabase_url", "https://mfbossnxodutqkhgromi.supabase.co");
         localStorage.setItem("cfg_supabase_key", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1mYm9zc254b2R1dHFraGdyb21pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3ODU4NjcsImV4cCI6MjA5NjM2MTg2N30.HXwzDEg9D5Y-UwFCis_3STVodH9pKRWVyr-TNR5ClCw");
@@ -419,6 +419,16 @@ Kunci: A</pre>
       
       // Auto focus input PIN login
       setTimeout(() => document.getElementById("loginPinField").focus(), 300);
+
+      // Cek apakah ada parameter URL page=dashboard untuk bypass PIN (Aman di ExBro)
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('page') === 'dashboard') {
+        navigateToScreen("screenTeacherDashboard");
+        renderDashboardCharts();
+        if (syncMode === "hybrid" && supabaseUrl && supabaseKey) {
+          startAutoSyncInterval();
+        }
+      }
     };
 
     // --- NAVIGATION ---
