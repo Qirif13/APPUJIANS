@@ -369,6 +369,35 @@
 
       // Deteksi Tampilan Banner iOS
       checkIosPwaBanner();
+
+      // Cek apakah ada parameter URL (otomatis masuk ujian dari ExBro/link)
+      const urlParams = new URLSearchParams(window.location.search);
+      const codeParam = urlParams.get('code');
+      const namaParam = urlParams.get('nama');
+      
+      if (codeParam) {
+        // Tentukan nama dan kelas dari parameter jika ada
+        if (namaParam) {
+          // Format namaParam biasanya: "Nama Lengkap (Kelas / Jurusan)"
+          const match = namaParam.match(/^(.*)\s*\((.*)\)$/);
+          if (match) {
+            document.getElementById("stdNama").value = match[1].trim();
+            document.getElementById("stdKelas").value = match[2].trim();
+          } else {
+            document.getElementById("stdNama").value = namaParam;
+          }
+        }
+        
+        document.getElementById("stdCodeSoal").value = codeParam;
+        
+        // Pindah ke layar setup dan mulai otomatis
+        navigateToScreen("screenStudentSetup");
+        
+        // Tunggu sebentar agar DOM selesai merender, lalu mulai ujian
+        setTimeout(() => {
+          loadExamFromInput();
+        }, 500);
+      }
     };
 
     function updateDateTime() {
