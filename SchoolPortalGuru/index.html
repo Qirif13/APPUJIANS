@@ -616,7 +616,19 @@ Kunci: A</pre>
           }
 
           // Verifikasi Tanda Tangan
-          const expectedSig = generateSignature(res.name, res.cls, res.score, res.cor, res.tot, res.subject, res.teacher);
+          let expectedSig = generateSignature(res.name, res.cls, res.score, res.cor, res.tot, res.subject, res.teacher);
+          if (res.sig !== expectedSig) {
+            // Coba legacy fallback
+            const legacySig = generateSignature(res.name, res.cls, res.score, res.cor, res.tot, "", "");
+            if (res.sig === legacySig) {
+              expectedSig = legacySig;
+            } else if (res.subject) {
+              const subjectOnlySig = generateSignature(res.name, res.cls, res.score, res.cor, res.tot, res.subject, "");
+              if (res.sig === subjectOnlySig) {
+                expectedSig = subjectOnlySig;
+              }
+            }
+          }
           if (res.sig !== expectedSig) {
             alert("⚠️ PERINGATAN: Tanda tangan QR tidak cocok! Nilai siswa ini kemungkinan telah dimanipulasi.");
             stopQrScanning();
@@ -729,7 +741,19 @@ Kunci: A</pre>
             }
 
             // Verifikasi Tanda Tangan Kripto
-            const expectedSig = generateSignature(res.name, res.cls, res.score, res.cor, res.tot, res.subject, res.teacher);
+            let expectedSig = generateSignature(res.name, res.cls, res.score, res.cor, res.tot, res.subject, res.teacher);
+            if (res.sig !== expectedSig) {
+              // Coba legacy fallback
+              const legacySig = generateSignature(res.name, res.cls, res.score, res.cor, res.tot, "", "");
+              if (res.sig === legacySig) {
+                expectedSig = legacySig;
+              } else if (res.subject) {
+                const subjectOnlySig = generateSignature(res.name, res.cls, res.score, res.cor, res.tot, res.subject, "");
+                if (res.sig === subjectOnlySig) {
+                  expectedSig = subjectOnlySig;
+                }
+              }
+            }
             if (res.sig !== expectedSig) {
               console.warn(`Tanda tangan tidak cocok untuk file: ${file.name}`);
               failCount++;
@@ -834,7 +858,19 @@ Kunci: A</pre>
         let addedCount = 0;
         
         data.forEach(item => {
-          const calculatedSig = generateSignature(item.name, item.cls, item.score, item.correct, item.total, item.subject, item.teacher);
+          let calculatedSig = generateSignature(item.name, item.cls, item.score, item.correct, item.total, item.subject, item.teacher);
+          if (item.sig !== calculatedSig) {
+            // Coba legacy fallback
+            const legacySig = generateSignature(item.name, item.cls, item.score, item.correct, item.total, "", "");
+            if (item.sig === legacySig) {
+              calculatedSig = legacySig;
+            } else if (item.subject) {
+              const subjectOnlySig = generateSignature(item.name, item.cls, item.score, item.correct, item.total, item.subject, "");
+              if (item.sig === subjectOnlySig) {
+                calculatedSig = subjectOnlySig;
+              }
+            }
+          }
           if (item.sig !== calculatedSig) {
             console.warn(`[Supabase Sync] Signature mismatch for student: ${item.name}. Data discarded.`);
             return;
