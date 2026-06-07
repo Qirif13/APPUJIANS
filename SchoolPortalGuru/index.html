@@ -134,6 +134,12 @@
     .modal-overlay.active .modal { transform: scale(1); }
     .modal-title { font-family: var(--font-title); font-weight: 700; font-size: 18px; margin: 0 0 8px 0; color: var(--color-primary); }
     .btn-group { display: flex; gap: 10px; margin-top: 20px; }
+
+    /* Filter Row for Teacher/Subject selection */
+    .filter-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px; }
+    @media (max-width: 600px) {
+      .filter-row { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
@@ -185,6 +191,22 @@
           <button class="btn-action" id="btnManualSync" onclick="manualSyncOnlineGrades()" style="display: none; padding: 6px 12px; font-size: 11px; max-width: 130px; background-color: var(--color-primary); color: #04080F; border-radius: 6px; font-weight: bold; border: none; cursor: pointer;">🔄 Sinkron Online</button>
         </div>
 
+        <!-- Dropdown Filter Guru & Mata Pelajaran -->
+        <div class="filter-row">
+          <div class="form-group" style="margin-bottom: 0;">
+            <label style="color: var(--color-primary); font-weight: bold; font-size: 11px;">Filter Guru / Pengawas</label>
+            <select class="form-control" id="filterTeacherSelect" onchange="onFilterTeacherChange()" style="background: rgba(15, 23, 42, 0.9); cursor: pointer; margin-top: 4px;">
+              <option value="all">Semua Guru</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label style="color: var(--color-primary); font-weight: bold; font-size: 11px;">Filter Mata Pelajaran</label>
+            <select class="form-control" id="filterSubjectSelect" onchange="onFilterSubjectChange()" style="background: rgba(15, 23, 42, 0.9); cursor: pointer; margin-top: 4px;">
+              <option value="all">Semua Mata Pelajaran</option>
+            </select>
+          </div>
+        </div>
+
         <div class="stats-row">
           <div class="stat-box">
             <h4>Total Masuk</h4>
@@ -221,6 +243,8 @@
             <tr>
               <th>Nama Siswa</th>
               <th>Kelas</th>
+              <th>Mata Pelajaran</th>
+              <th>Guru / Pengawas</th>
               <th>Benar/Total</th>
               <th>Skor</th>
               <th>Waktu Rekam</th>
@@ -228,7 +252,7 @@
           </thead>
           <tbody id="tableScoresBody">
             <tr>
-              <td colspan="5" style="text-align: center; color: var(--color-muted);">Belum ada data nilai masuk.</td>
+              <td colspan="6" style="text-align: center; color: var(--color-muted);">Belum ada data nilai masuk.</td>
             </tr>
           </tbody>
         </table>
@@ -251,6 +275,17 @@ B. Vasco da Gama
 C. Marco Polo
 D. Ferdinand Magellan
 Kunci: A</pre>
+        </div>
+
+        <div class="filter-row" style="margin-bottom: 16px;">
+          <div class="form-group" style="margin-bottom: 0;">
+            <label style="color: var(--color-primary);">Mata Pelajaran / Nama Ujian</label>
+            <input type="text" class="form-control" id="examSubjectInput" placeholder="Contoh: Agama Islam, Matematika XI..." style="margin-top: 4px;">
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label style="color: var(--color-primary);">Nama Guru / Pengawas</label>
+            <input type="text" class="form-control" id="examTeacherInput" placeholder="Contoh: Budi Santoso, S.Pd." style="margin-top: 4px;">
+          </div>
         </div>
 
         <textarea class="form-control" id="wordInputText" placeholder="Tempel (paste) teks soal dari Word Anda di sini..." style="height: 180px; font-family: monospace; font-size: 12px;" oninput="onWordTextInput()"></textarea>
@@ -391,6 +426,12 @@ Kunci: A</pre>
       // Muat data lokal
       const title = localStorage.getItem("cfg_school_title") || "PORTAL HUB SEKOLAH";
       document.getElementById("txtSchoolTitleMain").innerText = "PORTAL GURU - " + title;
+
+      // Set default Guru
+      const defaultTeacher = localStorage.getItem("cfg_teacher_name") || "";
+      if (document.getElementById("examTeacherInput")) {
+        document.getElementById("examTeacherInput").value = defaultTeacher;
+      }
 
       const CORRECT_URL = "https://mfbossnxodutqkhgromi.supabase.co";
       const CORRECT_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1mYm9zc254b2R1dHFraGdyb21pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3ODU4NjcsImV4cCI6MjA5NjM2MTg2N30.HXwzDEg9D5Y-UwFCis_3STVodH9pKRWVyr-TNR5ClCw";
@@ -575,7 +616,7 @@ Kunci: A</pre>
           }
 
           // Verifikasi Tanda Tangan
-          const expectedSig = generateSignature(res.name, res.cls, res.score, res.cor, res.tot);
+          const expectedSig = generateSignature(res.name, res.cls, res.score, res.cor, res.tot, res.subject, res.teacher);
           if (res.sig !== expectedSig) {
             alert("⚠️ PERINGATAN: Tanda tangan QR tidak cocok! Nilai siswa ini kemungkinan telah dimanipulasi.");
             stopQrScanning();
@@ -584,14 +625,22 @@ Kunci: A</pre>
 
           // Simpan Nilai secara Lokal
           const currentScores = JSON.parse(localStorage.getItem("local_grades_db") || "[]");
-          const isExist = currentScores.some(s => s.name.toLowerCase() === res.name.toLowerCase() && s.cls.toLowerCase() === res.cls.toLowerCase());
+          
+          // Deduplikasi berdasarkan Nama + Kelas + Mata Pelajaran
+          const isExist = currentScores.some(s => 
+            s.name.toLowerCase() === res.name.toLowerCase() && 
+            s.cls.toLowerCase() === res.cls.toLowerCase() &&
+            (s.subject || "Umum").toLowerCase() === (res.subject || "Umum").toLowerCase()
+          );
           
           if (isExist) {
-            alert(`Siswa bernama ${res.name} (${res.cls}) sudah terekam nilainya.`);
+            alert(`Siswa bernama ${res.name} (${res.cls}) sudah terekam nilainya untuk mata pelajaran ${(res.subject || "Umum")}.`);
           } else {
             currentScores.push({
               name: res.name,
               cls: res.cls,
+              subject: res.subject || "Umum",
+              teacher: res.teacher || "Umum",
               score: res.score,
               correct: res.cor,
               total: res.tot,
@@ -680,19 +729,25 @@ Kunci: A</pre>
             }
 
             // Verifikasi Tanda Tangan Kripto
-            const expectedSig = generateSignature(res.name, res.cls, res.score, res.cor, res.tot);
+            const expectedSig = generateSignature(res.name, res.cls, res.score, res.cor, res.tot, res.subject, res.teacher);
             if (res.sig !== expectedSig) {
               console.warn(`Tanda tangan tidak cocok untuk file: ${file.name}`);
               failCount++;
             } else {
-              // Cek duplikasi
-              const isExist = currentScores.some(s => s.name.toLowerCase() === res.name.toLowerCase() && s.cls.toLowerCase() === res.cls.toLowerCase());
+              // Cek duplikasi berdasarkan Nama + Kelas + Mata Pelajaran
+              const isExist = currentScores.some(s => 
+                s.name.toLowerCase() === res.name.toLowerCase() && 
+                s.cls.toLowerCase() === res.cls.toLowerCase() &&
+                (s.subject || "Umum").toLowerCase() === (res.subject || "Umum").toLowerCase()
+              );
               if (isExist) {
                 dupCount++;
               } else {
                 currentScores.push({
                   name: res.name,
                   cls: res.cls,
+                  subject: res.subject || "Umum",
+                  teacher: res.teacher || "Umum",
                   score: res.score,
                   correct: res.cor,
                   total: res.tot,
@@ -779,17 +834,25 @@ Kunci: A</pre>
         let addedCount = 0;
         
         data.forEach(item => {
-          const calculatedSig = generateSignature(item.name, item.cls, item.score, item.correct, item.total);
+          const calculatedSig = generateSignature(item.name, item.cls, item.score, item.correct, item.total, item.subject, item.teacher);
           if (item.sig !== calculatedSig) {
             console.warn(`[Supabase Sync] Signature mismatch for student: ${item.name}. Data discarded.`);
             return;
           }
           
-          const isExist = currentScores.some(s => s.name.toLowerCase() === item.name.toLowerCase() && s.cls.toLowerCase() === item.cls.toLowerCase());
+          // Deduplikasi berdasarkan Nama + Kelas + Mata Pelajaran
+          const isExist = currentScores.some(s => 
+            s.name.toLowerCase() === item.name.toLowerCase() && 
+            s.cls.toLowerCase() === item.cls.toLowerCase() &&
+            (s.subject || "Umum").toLowerCase() === (item.subject || "Umum").toLowerCase()
+          );
+          
           if (!isExist) {
             currentScores.push({
               name: item.name,
               cls: item.cls,
+              subject: item.subject || "Umum",
+              teacher: item.teacher || "Umum",
               score: item.score,
               correct: item.correct,
               total: item.total,
@@ -852,14 +915,107 @@ Kunci: A</pre>
       }
     }
 
+    function onFilterSubjectChange() {
+      refreshTeacherScoresTable();
+      renderDashboardCharts();
+    }
+
+    function onFilterTeacherChange() {
+      refreshTeacherScoresTable();
+      renderDashboardCharts();
+    }
+
+    let lastUniqueSubjectsJson = "";
+    let lastUniqueTeachersJson = "";
+
+    function updateFilterDropdowns(scores) {
+      // 1. Update Subject Dropdown
+      const subjectSelect = document.getElementById("filterSubjectSelect");
+      if (subjectSelect) {
+        const uniqueSubjects = ["all"];
+        scores.forEach(s => {
+          const subj = s.subject || "Umum";
+          if (!uniqueSubjects.includes(subj)) {
+            uniqueSubjects.push(subj);
+          }
+        });
+
+        const uniqueSubjectsJson = JSON.stringify(uniqueSubjects);
+        if (uniqueSubjectsJson !== lastUniqueSubjectsJson) {
+          lastUniqueSubjectsJson = uniqueSubjectsJson;
+          const currentVal = subjectSelect.value;
+          subjectSelect.innerHTML = "";
+          uniqueSubjects.forEach(subj => {
+            const opt = document.createElement("option");
+            opt.value = subj;
+            opt.innerText = subj === "all" ? "Semua Mata Pelajaran" : subj;
+            subjectSelect.appendChild(opt);
+          });
+          if (uniqueSubjects.includes(currentVal)) {
+            subjectSelect.value = currentVal;
+          } else {
+            subjectSelect.value = "all";
+          }
+        }
+      }
+
+      // 2. Update Teacher Dropdown
+      const teacherSelect = document.getElementById("filterTeacherSelect");
+      if (teacherSelect) {
+        const uniqueTeachers = ["all"];
+        scores.forEach(s => {
+          const teacher = s.teacher || "Umum";
+          if (!uniqueTeachers.includes(teacher)) {
+            uniqueTeachers.push(teacher);
+          }
+        });
+
+        const uniqueTeachersJson = JSON.stringify(uniqueTeachers);
+        if (uniqueTeachersJson !== lastUniqueTeachersJson) {
+          lastUniqueTeachersJson = uniqueTeachersJson;
+          const currentVal = teacherSelect.value;
+          teacherSelect.innerHTML = "";
+          uniqueTeachers.forEach(t => {
+            const opt = document.createElement("option");
+            opt.value = t;
+            opt.innerText = t === "all" ? "Semua Guru" : t;
+            teacherSelect.appendChild(opt);
+          });
+          if (uniqueTeachers.includes(currentVal)) {
+            teacherSelect.value = currentVal;
+          } else {
+            teacherSelect.value = "all";
+          }
+        }
+      }
+    }
+
     // --- GURU: REFRESH TABLE ---
     function refreshTeacherScoresTable() {
       const scores = JSON.parse(localStorage.getItem("local_grades_db") || "[]");
       const tbody = document.getElementById("tableScoresBody");
       tbody.innerHTML = "";
 
-      if (scores.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--color-muted);">Belum ada data nilai masuk.</td></tr>`;
+      // Kumpulkan semua mata pelajaran dan guru unik untuk memperbarui opsi dropdown
+      updateFilterDropdowns(scores);
+
+      // Dapatkan mata pelajaran & guru terpilih
+      const selectedSubject = document.getElementById("filterSubjectSelect") ? document.getElementById("filterSubjectSelect").value : "all";
+      const selectedTeacher = document.getElementById("filterTeacherSelect") ? document.getElementById("filterTeacherSelect").value : "all";
+
+      // Filter skor berdasarkan mata pelajaran & guru terpilih
+      const filteredScores = scores.filter(s => {
+        const scoreSubject = s.subject || "Umum";
+        const scoreTeacher = s.teacher || "Umum";
+        
+        const matchSubject = (selectedSubject === "all" || scoreSubject.toLowerCase() === selectedSubject.toLowerCase());
+        const matchTeacher = (selectedTeacher === "all" || scoreTeacher.toLowerCase() === selectedTeacher.toLowerCase());
+        
+        return matchSubject && matchTeacher;
+      });
+
+      if (filteredScores.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--color-muted);">Belum ada data nilai untuk filter ini.</td></tr>`;
         document.getElementById("statTotal").innerText = 0;
         document.getElementById("statRata").innerText = 0;
         document.getElementById("statLulus").innerText = 0;
@@ -869,7 +1025,7 @@ Kunci: A</pre>
       let totalScore = 0;
       let lulusCount = 0;
 
-      scores.forEach(s => {
+      filteredScores.forEach(s => {
         totalScore += s.score;
         if (s.score >= 75) lulusCount++;
 
@@ -877,6 +1033,8 @@ Kunci: A</pre>
         tr.innerHTML = `
           <td><b>${s.name}</b></td>
           <td>${s.cls}</td>
+          <td>${s.subject || 'Umum'}</td>
+          <td>${s.teacher || 'Umum'}</td>
           <td>${s.correct}/${s.total}</td>
           <td style="color:${s.score >= 75 ? 'var(--color-primary)':'var(--color-danger)'}; font-weight:bold;">${s.score}</td>
           <td style="color:var(--color-muted);">${s.time}</td>
@@ -884,17 +1042,30 @@ Kunci: A</pre>
         tbody.appendChild(tr);
       });
 
-      document.getElementById("statTotal").innerText = scores.length;
-      document.getElementById("statRata").innerText = Math.round(totalScore / scores.length);
+      document.getElementById("statTotal").innerText = filteredScores.length;
+      document.getElementById("statRata").innerText = Math.round(totalScore / filteredScores.length);
       document.getElementById("statLulus").innerText = lulusCount;
     }
 
     // --- GURU: CHART DRAWING ---
     function renderDashboardCharts() {
       const scores = JSON.parse(localStorage.getItem("local_grades_db") || "[]");
+      const selectedSubject = document.getElementById("filterSubjectSelect") ? document.getElementById("filterSubjectSelect").value : "all";
+      const selectedTeacher = document.getElementById("filterTeacherSelect") ? document.getElementById("filterTeacherSelect").value : "all";
+
+      const filteredScores = scores.filter(s => {
+        const scoreSubject = s.subject || "Umum";
+        const scoreTeacher = s.teacher || "Umum";
+        
+        const matchSubject = (selectedSubject === "all" || scoreSubject.toLowerCase() === selectedSubject.toLowerCase());
+        const matchTeacher = (selectedTeacher === "all" || scoreTeacher.toLowerCase() === selectedTeacher.toLowerCase());
+        
+        return matchSubject && matchTeacher;
+      });
+
       const sebaran = [0, 0, 0, 0, 0]; // <60, 60-69, 70-79, 80-89, 90-100
 
-      scores.forEach(s => {
+      filteredScores.forEach(s => {
         const v = s.score;
         if (v < 60) sebaran[0]++;
         else if (v < 70) sebaran[1]++;
@@ -1001,6 +1172,10 @@ Kunci: A</pre>
         return;
       }
 
+      const subjectName = document.getElementById("examSubjectInput").value.trim() || "Umum";
+      const teacherName = document.getElementById("examTeacherInput").value.trim() || "Umum";
+      localStorage.setItem("cfg_teacher_name", teacherName);
+
       // Sisipkan setelan sinkronisasi database online milik guru ke dalam kode ujian!
       const syncConfig = {
         mode: localStorage.getItem("cfg_sync_mode") || "offline",
@@ -1010,7 +1185,9 @@ Kunci: A</pre>
 
       const examPayload = {
         questions: parsedWordQuestions,
-        sync: syncConfig
+        sync: syncConfig,
+        subject: subjectName,
+        teacher: teacherName
       };
 
       const jsonString = JSON.stringify(examPayload);
@@ -1035,7 +1212,9 @@ Kunci: A</pre>
             },
             body: JSON.stringify({
               questions: parsedWordQuestions,
-              sync: syncConfig
+              sync: syncConfig,
+              subject: subjectName,
+              teacher: teacherName
             })
           });
 
@@ -1102,8 +1281,17 @@ Kunci: A</pre>
       alert("Kode Ujian berhasil disalin ke clipboard!");
     }
 
-    function generateSignature(nama, kelas, skor, benar, total) {
-      const rawStr = `${nama}|${kelas}|${skor}|${benar}|${total}|${SECRET_HASH_SALT}`;
+    function generateSignature(nama, kelas, skor, benar, total, mataPelajaran, namaGuru) {
+      const subject = mataPelajaran || "";
+      const teacher = namaGuru || "";
+      let rawStr;
+      if (subject && teacher) {
+        rawStr = `${nama}|${kelas}|${skor}|${benar}|${total}|${subject}|${teacher}|${SECRET_HASH_SALT}`;
+      } else if (subject) {
+        rawStr = `${nama}|${kelas}|${skor}|${benar}|${total}|${subject}|${SECRET_HASH_SALT}`;
+      } else {
+        rawStr = `${nama}|${kelas}|${skor}|${benar}|${total}|${SECRET_HASH_SALT}`;
+      }
       let hash = 0;
       for (let i = 0; i < rawStr.length; i++) {
         const char = rawStr.charCodeAt(i);
@@ -1130,12 +1318,25 @@ Kunci: A</pre>
         return;
       }
 
+      const selectedSubject = document.getElementById("filterSubjectSelect") ? document.getElementById("filterSubjectSelect").value : "all";
+      const selectedTeacher = document.getElementById("filterTeacherSelect") ? document.getElementById("filterTeacherSelect").value : "all";
+
+      const filteredScores = scores.filter(s => {
+        const scoreSubject = s.subject || "Umum";
+        const scoreTeacher = s.teacher || "Umum";
+        
+        const matchSubject = (selectedSubject === "all" || scoreSubject.toLowerCase() === selectedSubject.toLowerCase());
+        const matchTeacher = (selectedTeacher === "all" || scoreTeacher.toLowerCase() === selectedTeacher.toLowerCase());
+        
+        return matchSubject && matchTeacher;
+      });
+
       // Gunakan sep=, agar Excel otomatis memisah kolom pada semua regional setting
       let csvContent = "data:text/csv;charset=utf-8,sep=,\r\n";
-      csvContent += "Nama Siswa,Kelas,Benar,Total Soal,Skor,Waktu Rekam\n";
+      csvContent += "Nama Siswa,Kelas,Mata Pelajaran,Guru / Pengawas,Benar,Total Soal,Skor,Waktu Rekam\n";
 
-      scores.forEach(s => {
-        csvContent += `"${s.name}","${s.cls}",${s.correct},${s.total},${s.score},"${s.time}"\n`;
+      filteredScores.forEach(s => {
+        csvContent += `"${s.name}","${s.cls}","${s.subject || 'Umum'}","${s.teacher || 'Umum'}",${s.correct},${s.total},${s.score},"${s.time}"\n`;
       });
 
       const encodedUri = encodeURI(csvContent);
