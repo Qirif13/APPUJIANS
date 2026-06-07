@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Portal Siswa Hub</title>
+  
+  <!-- Manifest & PWA Meta Tags -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0B132B">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="PortalSiswa">
+  <link rel="apple-touch-icon" href="icon-192.png">
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Caching Libraries (Cached by sw.js for offline use) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+
+  <style>
+    :root {
+      --bg-color: #080C1E;
+      --card-bg: rgba(15, 23, 42, 0.65);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --font-title: 'Outfit', sans-serif;
+      --font-body: 'Inter', sans-serif;
+      --color-primary: #38BDF8;
+      --color-success: #10B981;
+      --color-warning: #F59E0B;
+      --color-danger: #EF4444;
+      --color-text: #F8FAFC;
+      --color-muted: #64748B;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: var(--font-body);
+      background-color: var(--bg-color);
+      color: var(--color-text);
+      overflow-x: hidden;
+      min-height: 100vh;
+      position: relative;
+    }
+
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(120px);
+      z-index: 0;
+      opacity: 0.15;
+      pointer-events: none;
+    }
+    .orb-1 { top: -10%; left: -10%; width: 450px; height: 450px; background: linear-gradient(135deg, var(--color-primary), #8B5CF6); }
+    .orb-2 { bottom: -10%; right: -10%; width: 450px; height: 450px; background: linear-gradient(135deg, #3B82F6, #10B981); }
+
+    /* Screen Wrapper */
+    .screen {
+      display: none;
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      min-height: 100vh;
+      padding: 24px;
+    }
+    .screen.active {
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Portal Home Header */
+    .header { text-align: center; margin-bottom: 30px; margin-top: 30px; }
+    .logo { width: 90px; height: 90px; border-radius: 24px; box-shadow: 0 10px 30px rgba(56, 189, 248, 0.25); border: 2px solid rgba(255, 255, 255, 0.1); margin-bottom: 15px; }
+    h1 { font-family: var(--font-title); font-weight: 700; font-size: 26px; margin: 0 0 6px 0; letter-spacing: 0.05em; background: linear-gradient(135deg, #FFF 30%, var(--color-primary) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .subtitle { font-size: 13px; color: var(--color-muted); margin: 0; }
+    
+    /* Menu Grid */
+    .menu-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; width: 100%; max-width: 700px; margin: 0 auto; }
+    @media (max-width: 600px) {
+      .menu-grid { grid-template-columns: 1fr; gap: 12px; }
+    }
+    .card-menu { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 24px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; height: 160px; cursor: pointer; backdrop-filter: blur(20px); transition: transform 0.2s, background-color 0.2s; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2); }
+    .card-menu:active { transform: scale(0.96); background: rgba(255, 255, 255, 0.04); }
+    .card-icon { font-size: 36px; margin-bottom: 12px; }
+    .card-title { font-family: var(--font-title); font-weight: 600; font-size: 15px; color: #FFF; margin: 0 0 6px 0; }
+    .card-desc { font-size: 11px; color: var(--color-muted); margin: 0; }
+    .card-web { border-bottom: 4px solid var(--color-primary); }
+    .card-lms { border-bottom: 4px solid var(--color-success); }
+    .card-ujian { border-bottom: 4px solid #8B5CF6; }
+
+    /* Webview Integration */
+    .portal-screen { width: 100vw; height: 100vh; position: fixed; top: 0; left: 0; z-index: 100; background: var(--bg-color); display: none; }
+    .portal-header { background: #0F172A; border-bottom: 1px solid var(--card-border); padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; height: 60px; }
+    .btn-back { background: rgba(255, 255, 255, 0.08); border: 1px solid var(--card-border); color: #FFF; font-family: var(--font-title); font-weight: 600; font-size: 13px; padding: 8px 14px; border-radius: 8px; cursor: pointer; }
+    .portal-title { font-family: var(--font-title); font-weight: 600; font-size: 16px; color: #FFF; margin: 0; flex: 1; text-align: center; }
+    .portal-status { display: flex; align-items: center; gap: 6px; background: rgba(16, 185, 129, 0.1); color: var(--color-success); font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 20px; }
+    .status-dot { width: 6px; height: 6px; border-radius: 50%; background-color: var(--color-success); box-shadow: 0 0 6px var(--color-success); }
+    .portal-frame { width: 100vw; height: calc(100vh - 60px); border: none; background: #FFF; }
+
+    /* Glass Cards & Forms */
+    .glass-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 24px; padding: 26px; width: 100%; max-width: 500px; margin: 0 auto; backdrop-filter: blur(20px); box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4); }
+    .glass-card h2 { font-family: var(--font-title); color: var(--color-primary); margin-top: 0; font-size: 22px; display: flex; align-items: center; gap: 8px; }
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-size: 11px; font-weight: 600; color: var(--color-muted); text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.05em; }
+    .form-control { width: 100%; background: rgba(15, 23, 42, 0.6); border: 1px solid var(--card-border); border-radius: 12px; padding: 12px; color: #FFF; font-family: var(--font-body); font-size: 14px; outline: none; transition: border-color 0.2s; }
+    .form-control:focus { border-color: var(--color-primary); }
+    .btn-submit { width: 100%; background: var(--color-primary); color: #080C1E; font-family: var(--font-title); font-weight: 700; padding: 14px; border: none; border-radius: 12px; font-size: 15px; cursor: pointer; transition: transform 0.1s; }
+    .btn-submit:active { transform: scale(0.98); }
+    .btn-action { width: 100%; padding: 12px; border-radius: 12px; font-family: var(--font-title); font-weight: 600; font-size: 14px; border: none; cursor: pointer; }
+    .btn-action-primary { background: var(--color-primary); color: #080C1E; }
+    .btn-action-secondary { background: #1E293B; color: #FFF; border: 1px solid var(--card-border); }
+
+    /* Exam Page Styles */
+    .exam-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--card-border); padding-bottom: 12px; margin-bottom: 20px; }
+    .exam-progress { font-size: 13px; font-weight: 600; color: var(--color-primary); }
+    .question-box { font-size: 16px; font-weight: 600; line-height: 1.6; margin-bottom: 22px; color: #F8FAFC; }
+    .option-btn { display: block; width: 100%; text-align: left; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--card-border); padding: 14px 16px; border-radius: 12px; color: var(--color-text); font-size: 14px; margin-bottom: 12px; cursor: pointer; transition: background-color 0.2s, border-color 0.2s; }
+    .option-btn.selected { background: rgba(56, 189, 248, 0.12); border-color: var(--color-primary); font-weight: 600; }
+    .nav-buttons { display: flex; justify-content: space-between; margin-top: 24px; gap: 12px; }
+    .btn-nav { flex: 1; background: #1E293B; color: #FFF; font-family: var(--font-title); font-weight: 600; font-size: 14px; padding: 12px; border: 1px solid var(--card-border); border-radius: 10px; cursor: pointer; }
+    .btn-nav-primary { flex: 1.5; background: var(--color-primary); color: #080C1E; border: none; }
+
+    /* Results and QR Code */
+    .qr-container { display: flex; flex-direction: column; align-items: center; margin: 20px 0; background: #FFF; padding: 18px; border-radius: 20px; width: fit-content; margin: 20px auto; box-shadow: 0 8px 30px rgba(0,0,0,0.3); }
+    .qr-desc { text-align: center; font-size: 11px; color: #080C1E; font-weight: 700; margin-top: 8px; letter-spacing: 0.05em; }
+    #qr-reader { width: 100%; border-radius: 16px; overflow: hidden; margin-bottom: 16px; border: 1px solid var(--card-border); }
+
+    /* iOS Guide Banner */
+    .install-banner { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(150%); width: calc(100% - 40px); max-width: 500px; background: rgba(15, 23, 42, 0.95); border: 1px solid var(--color-primary); border-radius: 18px; padding: 16px; z-index: 150; display: flex; align-items: center; gap: 12px; transition: transform 0.4s; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+    .install-banner.active { transform: translateX(-50%) translateY(0); }
+    .install-text { flex: 1; font-size: 11px; }
+    .install-text h4 { margin: 0 0 4px 0; color: var(--color-primary); font-size: 13px; }
+    .install-text p { margin: 0; color: #cbd5e1; }
+    .btn-close-banner { background: none; border: none; color: var(--color-muted); font-size: 18px; cursor: pointer; }
+  </style>
+</head>
+<body>
+
+  <!-- Decorative Orbs -->
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <!-- ========================================== -->
+  <!-- SCREEN 1: PORTAL HOME SCREEN (DASHBOARD)   -->
+  <!-- ========================================== -->
+  <div class="screen active" id="screenHome">
+    <div class="header">
+      <img src="icon-512.png" alt="Logo Sekolah" class="logo">
+      <h1 id="txtSchoolTitle">PORTAL SISWA HUB</h1>
+      <p class="subtitle" id="txtDateTime">Selamat Datang di Pusat Belajar & Ujian Online</p>
+    </div>
+
+    <div class="menu-grid">
+      <div class="card-menu card-web" onclick="openWebMenu('website')">
+        <span class="card-icon">🌐</span>
+        <h4 class="card-title">Portal Website</h4>
+        <p class="card-desc">Situs Informasi Sekolah</p>
+      </div>
+      
+      <div class="card-menu card-lms" onclick="openWebMenu('lms')">
+        <span class="card-icon">🎓</span>
+        <h4 class="card-title">E-Learning</h4>
+        <p class="card-desc">LMS / Media Belajar</p>
+      </div>
+      
+      <div class="card-menu card-ujian" onclick="handleUjianOnlineClick()">
+        <span class="card-icon">📝</span>
+        <h4 class="card-title">Ujian Online</h4>
+        <p class="card-desc">Mengerjakan Ujian Sekolah</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- SCREEN 2: BROWSER VIEW (Website/LMS)       -->
+  <!-- ========================================== -->
+  <div class="portal-screen" id="screenWebview">
+    <div class="portal-header">
+      <button class="btn-back" onclick="closeWebview()">⬅ Beranda</button>
+      <h3 class="portal-title" id="webviewTitle">Portal</h3>
+      <div class="portal-status"><div class="status-dot"></div><span>Online</span></div>
+    </div>
+    <iframe src="about:blank" class="portal-frame" id="portalFrame"></iframe>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- SCREEN 3: STUDENT SETUP (MULAI UJIAN)      -->
+  <!-- ========================================== -->
+  <div class="screen" id="screenStudentSetup">
+    <div class="glass-card">
+      <h2>📝 Mulai Ujian Baru</h2>
+      <p class="subtitle" style="margin-bottom: 20px;">Masukkan nama, kelas, dan kode soal ujian Anda:</p>
+      
+      <div class="form-group">
+        <label>Nama Lengkap</label>
+        <input type="text" class="form-control" id="stdNama" placeholder="Ketik nama lengkap Anda">
+      </div>
+
+      <div class="form-group">
+        <label>Kelas / Jurusan</label>
+        <input type="text" class="form-control" id="stdKelas" placeholder="Contoh: XI DKV B">
+      </div>
+
+      <div class="form-group">
+        <label>Kode Soal (Teks) / Scan QR Soal</label>
+        <textarea class="form-control" id="stdCodeSoal" placeholder="Tempel (paste) kode ujian dari guru di sini..." style="height: 90px; font-family: monospace; font-size: 11px;"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Atau Unggah Berkas Ujian (.txt / .json)</label>
+        <input type="file" id="fileSoalInput" accept=".txt,.json" class="form-control" style="padding: 6px;" onchange="loadExamFromFile(event)">
+      </div>
+
+      <div style="display: flex; gap: 12px; margin-top: 24px;">
+        <button class="btn-action btn-action-secondary" onclick="navigateToScreen('screenHome')" style="flex:1;">Batal</button>
+        <button class="btn-submit" onclick="loadExamFromInput()" style="flex:2;">Mulai Ujian</button>
+      </div>
+
+      <div style="text-align: center; margin-top: 15px;">
+        <span style="font-size: 11px; color: var(--color-muted);">Atau</span><br>
+        <button class="btn-action btn-action-secondary" onclick="startScanningExamCode()" style="margin-top: 8px; width: 100%;">📷 Scan QR Code Soal Guru</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- SCREEN 4: STUDENT EXAM ENGINE (OFFLINE)    -->
+  <!-- ========================================== -->
+  <div class="screen" id="screenExamEngine">
+    <div class="glass-card" style="max-width: 650px;">
+      <div class="exam-header">
+        <span class="exam-progress" id="txtExamProgress">Soal 1 dari 10</span>
+        <div class="portal-status" style="background: rgba(239, 68, 68, 0.1); color: var(--color-danger);"><div class="status-dot" style="background-color: var(--color-danger); box-shadow: 0 0 8px var(--color-danger);"></div><span>Mode Ujian</span></div>
+      </div>
+
+      <div class="question-box" id="txtQuestion">Memuat soal...</div>
+      
+      <div id="optionsContainer">
+        <!-- Buttons option A, B, C, D will generate here -->
+      </div>
+
+      <div class="nav-buttons">
+        <button class="btn-nav" id="btnPrev" onclick="navigateQuestion(-1)">Sebelumnya</button>
+        <button class="btn-nav btn-nav-primary" id="btnNext" onclick="navigateQuestion(1)">Berikutnya</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- SCREEN 5: STUDENT RESULT (QR / FILE)       -->
+  <!-- ========================================== -->
+  <div class="screen" id="screenExamResult">
+    <div class="glass-card" style="text-align: center;">
+      <h2 style="color: var(--color-success); justify-content: center;" id="resStatusTitle">✓ Ujian Selesai!</h2>
+      <p style="font-size: 14px; margin-bottom: 20px;" id="resStatusDesc">Tunjukkan layar ini kepada Guru untuk memindai nilai Anda:</p>
+      
+      <div style="background: rgba(255,255,255,0.02); padding: 14px; border-radius: 12px; border: 1px solid var(--card-border); text-align: left; display: inline-block; width: 100%; margin-bottom: 20px;">
+        <p style="margin: 4px 0; font-size: 13px;"><b>Nama:</b> <span id="resNama">-</span></p>
+        <p style="margin: 4px 0; font-size: 13px;"><b>Kelas:</b> <span id="resKelas">-</span></p>
+        <p style="margin: 4px 0; font-size: 13px;"><b>Skor Ujian:</b> <span id="resSkor" style="color: var(--color-success); font-weight: bold;">0</span> / 100</p>
+        <p style="margin: 4px 0; font-size: 12px; color: var(--color-muted);" id="resSyncInfo"></p>
+      </div>
+
+      <!-- QR Code Area for offline collection -->
+      <div id="qrOfflineArea">
+        <div class="qr-container">
+          <div id="qrcodeNilai"></div>
+          <div class="qr-desc">QR CODE NILAI SAH (TERVERIFIKASI)</div>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 15px;">
+        <button class="btn-action btn-action-primary" id="btnDownloadGrade" onclick="downloadStudentGradeFile()" style="background-color: #3b82f6; color: #FFF; width: 100%;">📥 Unduh File Nilai (.txt)</button>
+        <button class="btn-submit" onclick="resetExamStateAndExit()" style="background-color: #334155; color: #FFF; margin-top: 0;">Keluar ke Beranda</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- SCREEN 6: CAMERA QR SCANNER                -->
+  <!-- ========================================== -->
+  <div class="screen" id="screenQrScanner">
+    <div class="glass-card" style="text-align: center;">
+      <h2 id="scannerScreenTitle">📷 Pindai QR Code</h2>
+      <p class="subtitle" id="scannerScreenDesc" style="margin-bottom: 20px;">Arahkan kamera ke QR Code Guru</p>
+      
+      <div id="qr-reader"></div>
+
+      <button class="btn-submit" onclick="stopQrScanning()" style="background-color: var(--color-danger); color: #FFF;">Batal & Kembali</button>
+    </div>
+  </div>
+
+  <!-- iOS Safari Install Guide Banner -->
+  <div class="install-banner" id="iosInstallBanner">
+    <span style="font-size: 24px;">📱</span>
+    <div class="install-text">
+      <h4>Pasang di Layar Utama iPhone</h4>
+      <p>Ketuk tombol bagikan 📤 di Safari, lalu pilih "Tambahkan ke Layar Utama" ➕ untuk memasang.</p>
+    </div>
+    <button class="btn-close-banner" onclick="closeInstallBanner()">✕</button>
+  </div>
+
+  <!-- Modal Konfirmasi Buka MYBRO2 (Aman) -->
+  <div id="mybroModal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(8, 12, 30, 0.85); backdrop-filter: blur(8px); z-index: 1000; align-items: center; justify-content: center; padding: 24px;">
+    <div class="glass-card" style="text-align: center; max-width: 420px; border: 1px solid rgba(56, 189, 248, 0.2); box-shadow: 0 20px 50px rgba(56, 189, 248, 0.15); animation: modalFadeIn 0.3s ease-out;">
+      <div style="font-size: 56px; margin-bottom: 16px;">🛡️</div>
+      <h3 style="font-family: var(--font-title); font-size: 20px; font-weight: 700; color: var(--color-primary); margin: 0 0 10px 0; letter-spacing: 0.03em;">Gunakan Aplikasi MYBRO</h3>
+      <p style="font-size: 13px; color: #CBD5E1; line-height: 1.6; margin: 0 0 24px 0;">
+        Ujian online sangat disarankan dibuka menggunakan aplikasi aman <b>MYBRO</b> untuk mencegah keluar masuk aplikasi selama ujian berlangsung.
+      </p>
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        <button class="btn-submit" onclick="launchMybroApp()" style="background: linear-gradient(135deg, var(--color-primary), #3B82F6); color: #080C1E; font-weight: 700;">🚀 Buka Aplikasi MYBRO</button>
+        <button class="btn-action btn-action-secondary" onclick="continueInBrowser()">Mengerjakan di Browser</button>
+        <button class="btn-action btn-action-secondary" onclick="closeMybroModal()" style="border: none; background: transparent; color: var(--color-muted); padding: 8px;">Batal</button>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    @keyframes modalFadeIn {
+      from { opacity: 0; transform: scale(0.95) translateY(10px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+  </style>
+
+  <script>
+    // --- APP GLOBAL STATE ---
+    let activeScreenId = "screenHome";
+    const SECRET_HASH_SALT = "SCHOOL_PORTAL_SECRET_2026";
+
+    // Dynamic Database configuration (Loaded from Exam Code)
+    let syncMode = "offline";
+    let supabaseUrl = "";
+    let supabaseKey = "";
+
+    // Siswa State
+    let currentQuestions = [];
+    let currentQuestionIndex = 0;
+    let studentAnswers = {};
+    let studentNama = "";
+    let studentKelas = "";
+    let lastResultString = ""; 
+    let qrScannerInstance = null;
+
+    // --- INITIALIZATION ---
+    window.onload = function() {
+      // Muat data lokal
+      const title = localStorage.getItem("cfg_school_title") || "PORTAL SISWA HUB";
+      document.getElementById("txtSchoolTitle").innerText = title;
+
+      // Update waktu
+      updateDateTime();
+      setInterval(updateDateTime, 60000);
+
+      // Register PWA Service Worker
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register("sw.js")
+          .then(() => console.log("Service Worker Registered"))
+          .catch(err => console.log("Service Worker Registration Failed", err));
+      }
+
+      // Deteksi Tampilan Banner iOS
+      checkIosPwaBanner();
+    };
+
+    function updateDateTime() {
+      const now = new Date();
+      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+      document.getElementById("txtDateTime").innerText = now.toLocaleDateString("id-ID", options);
+    }
+
+    // --- NAVIGATION ---
+    function navigateToScreen(screenId) {
+      document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+      const targetScreen = document.getElementById(screenId);
+      if (targetScreen) {
+        targetScreen.classList.add("active");
+        activeScreenId = screenId;
+      }
+      if (screenId !== 'screenWebview') {
+        document.getElementById('screenWebview').style.display = 'none';
+      }
+    }
+
+    // --- WEBVIEW ---
+    function openWebMenu(menuKey) {
+      const defaultUrlWeb = "https://smaprestasiprima.sch.id";
+      const defaultUrlLms = "https://classroom.google.com";
+
+      const urlWeb = localStorage.getItem("url_website") || defaultUrlWeb;
+      const urlLms = localStorage.getItem("url_lms") || defaultUrlLms;
+
+      const title = menuKey === 'website' ? "Website Sekolah" : "E-Learning / LMS";
+      const url = menuKey === 'website' ? urlWeb : urlLms;
+
+      document.getElementById("webviewTitle").innerText = title;
+      document.getElementById("portalFrame").src = url;
+      
+      document.getElementById("screenWebview").style.display = "block";
+    }
+
+    function closeWebview() {
+      document.getElementById("portalFrame").src = "about:blank";
+      document.getElementById("screenWebview").style.display = "none";
+      navigateToScreen("screenHome");
+    }
+
+    // --- STUDENT EXAM LOGIC ---
+    function loadExamFromInput() {
+      studentNama = document.getElementById("stdNama").value.trim();
+      studentKelas = document.getElementById("stdKelas").value.trim();
+      const rawCode = document.getElementById("stdCodeSoal").value.trim();
+
+      if (!studentNama || !studentKelas || !rawCode) {
+        alert("Mohon lengkapi Nama, Kelas, dan masukkan Kode Soal!");
+        return;
+      }
+
+      // Cek jika input adalah URL langsung (seperti Google Forms)
+      if (rawCode.startsWith("http://") || rawCode.startsWith("https://") || rawCode.includes("forms.gle") || rawCode.includes("docs.google.com")) {
+        let targetUrl = rawCode;
+        if (!targetUrl.startsWith("http://") && !targetUrl.startsWith("https://")) {
+          targetUrl = "https://" + targetUrl;
+        }
+        window.location.href = targetUrl;
+        return;
+      }
+
+      try {
+        // Decode base64 kode soal
+        const decodedString = atob(rawCode);
+        const examData = JSON.parse(decodedString);
+        
+        if (examData.questions && Array.isArray(examData.questions)) {
+          currentQuestions = examData.questions;
+          // Ekstrak setelan sinkronisasi database dari guru secara otomatis!
+          if (examData.sync) {
+            syncMode = examData.sync.mode || "offline";
+            supabaseUrl = examData.sync.url || "";
+            supabaseKey = examData.sync.key || "";
+          } else {
+            syncMode = "offline";
+          }
+        } else if (Array.isArray(examData)) {
+          // Format lama (legacy support)
+          currentQuestions = examData;
+          syncMode = "offline";
+        } else {
+          throw new Error("Format soal tidak valid");
+        }
+
+        if (currentQuestions.length === 0) throw new Error("Soal kosong");
+
+        // Mulai ujian
+        currentQuestionIndex = 0;
+        studentAnswers = {};
+        navigateToScreen("screenExamEngine");
+        showQuestion(0);
+      } catch (err) {
+        alert("Gagal membaca kode soal! Pastikan kode soal yang Anda tempel sudah benar.");
+      }
+    }
+
+    function showQuestion(index) {
+      if (index < 0 || index >= currentQuestions.length) return;
+      currentQuestionIndex = index;
+      
+      document.getElementById("txtExamProgress").innerText = `Soal ${index + 1} dari ${currentQuestions.length}`;
+      
+      const q = currentQuestions[index];
+      document.getElementById("txtQuestion").innerText = `${q.no}. ${q.pertanyaan}`;
+
+      const optionsContainer = document.getElementById("optionsContainer");
+      optionsContainer.innerHTML = "";
+
+      for (let opt in q.options) {
+        if (q.options[opt]) {
+          const btn = document.createElement("button");
+          btn.className = "option-btn";
+          if (studentAnswers[q.no] === opt) {
+            btn.classList.add("selected");
+          }
+          btn.innerText = `${opt}. ${q.options[opt]}`;
+          btn.onclick = () => selectStudentAnswer(q.no, opt);
+          optionsContainer.appendChild(btn);
+        }
+      }
+
+      // Atur tombol navigasi
+      document.getElementById("btnPrev").disabled = index === 0;
+      
+      const btnNext = document.getElementById("btnNext");
+      if (index === currentQuestions.length - 1) {
+        btnNext.innerText = "Kirim Jawaban";
+        btnNext.className = "btn-nav btn-nav-primary";
+      } else {
+        btnNext.innerText = "Berikutnya";
+        btnNext.className = "btn-nav";
+      }
+    }
+
+    function selectStudentAnswer(noSoal, value) {
+      studentAnswers[noSoal] = value;
+      showQuestion(currentQuestionIndex);
+    }
+
+    function navigateQuestion(step) {
+      const nextIndex = currentQuestionIndex + step;
+      if (nextIndex === currentQuestions.length) {
+        submitOfflineExam();
+      } else {
+        showQuestion(nextIndex);
+      }
+    }
+
+    function submitOfflineExam() {
+      // Hitung jumlah soal terisi
+      const answeredCount = Object.keys(studentAnswers).length;
+      if (answeredCount < currentQuestions.length) {
+        if (!confirm(`Ada ${currentQuestions.length - answeredCount} soal belum diisi. Tetap kumpulkan jawaban?`)) {
+          return;
+        }
+      }
+
+      // Hitung Skor
+      let benar = 0;
+      currentQuestions.forEach(q => {
+        const correctKey = q.kunci ? q.kunci.toUpperCase() : "";
+        const studentAns = studentAnswers[q.no] ? studentAnswers[q.no].toUpperCase() : "";
+        if (correctKey && studentAns === correctKey) {
+          benar++;
+        }
+      });
+
+      const total = currentQuestions.length;
+      const skor = Math.round((benar / total) * 100);
+
+      // Generate Cryptographic Signature untuk mencegah pemalsuan QR Code Nilai
+      const signature = generateSignature(studentNama, studentKelas, skor, benar, total);
+
+      // Data yang dibungkus di dalam QR Code Nilai
+      const resultObj = {
+        name: studentNama,
+        cls: studentKelas,
+        score: skor,
+        cor: benar,
+        tot: total,
+        ans: Object.entries(studentAnswers).map(([k,v]) => `${k}:${v}`).join(","),
+        sig: signature
+      };
+
+      const resultString = JSON.stringify(resultObj);
+      lastResultString = resultString; // Simpan di cache untuk diunduh siswa
+
+      // Tampilkan data nilai dasar di layar
+      document.getElementById("resNama").innerText = studentNama;
+      document.getElementById("resKelas").innerText = studentKelas;
+      document.getElementById("resSkor").innerText = skor;
+
+      // Cek apakah ada sinkronisasi online
+      if (syncMode === "hybrid" && supabaseUrl && supabaseKey) {
+        document.getElementById("resStatusTitle").innerText = "⏳ Mengirim Nilai...";
+        document.getElementById("resStatusDesc").innerText = "Sedang mengunggah hasil ujian Anda ke database Guru...";
+        document.getElementById("qrOfflineArea").style.display = "none";
+        document.getElementById("resSyncInfo").innerText = "Mengirim data nirkabel...";
+        
+        navigateToScreen("screenExamResult");
+
+        // Payload untuk Supabase
+        const payload = {
+          name: studentNama,
+          cls: studentKelas,
+          score: skor,
+          correct: benar,
+          total: total,
+          time: new Date().toLocaleTimeString("id-ID", { hour: '2-digit', minute: '2-digit' }),
+          sig: signature
+        };
+
+        fetch(`${supabaseUrl}/rest/v1/grades`, {
+          method: "POST",
+          headers: {
+            "apikey": supabaseKey,
+            "Authorization": `Bearer ${supabaseKey}`,
+            "Content-Type": "application/json",
+            "Prefer": "return=representation"
+          },
+          body: JSON.stringify(payload)
+        })
+        .then(res => {
+          if (!res.ok) throw new Error("Gagal mengunggah");
+          // Berhasil terkirim otomatis via internet
+          document.getElementById("resStatusTitle").innerText = "✓ Nilai Terkirim Otomatis!";
+          document.getElementById("resStatusDesc").innerText = "Ujian selesai dan skor Anda telah berhasil diunggah langsung ke database Guru menggunakan koneksi internet Anda.";
+          document.getElementById("resSyncInfo").innerText = "Status: Terkirim Online 📡";
+        })
+        .catch(err => {
+          // Gagal kirim online (fallback ke scan QR/file offline)
+          console.warn("Upload failed, showing offline fallback QR.", err);
+          document.getElementById("resStatusTitle").innerText = "✓ Nilai Tersimpan Lokal";
+          document.getElementById("resStatusDesc").innerText = "Gagal mengirim nilai otomatis (tidak ada kuota/jaringan). Silakan tunjukkan QR Code di bawah ke Guru untuk di-scan, atau unduh file nilai Anda.";
+          document.getElementById("resSyncInfo").innerText = "Status: Menunggu Scan Manual / Impor File ⚠️";
+          document.getElementById("qrOfflineArea").style.display = "block";
+          
+          // Render QR Code Nilai
+          renderQrCodeNilai(resultString);
+        });
+      } else {
+        // Mode offline standar (langsung tampilkan QR Code)
+        document.getElementById("resStatusTitle").innerText = "✓ Ujian Selesai!";
+        document.getElementById("resStatusDesc").innerText = "Tunjukkan layar ini kepada Guru untuk memindai nilai Anda:";
+        document.getElementById("resSyncInfo").innerText = "";
+        document.getElementById("qrOfflineArea").style.display = "block";
+        
+        // Render QR Code Nilai
+        renderQrCodeNilai(resultString);
+        navigateToScreen("screenExamResult");
+      }
+    }
+
+    function renderQrCodeNilai(textData) {
+      const qrContainer = document.getElementById("qrcodeNilai");
+      qrContainer.innerHTML = "";
+      new QRCode(qrContainer, {
+        text: textData,
+        width: 180,
+        height: 180,
+        correctLevel: QRCode.CorrectLevel.L
+      });
+    }
+
+    function generateSignature(nama, kelas, skor, benar, total) {
+      const rawStr = `${nama}|${kelas}|${skor}|${benar}|${total}|${SECRET_HASH_SALT}`;
+      let hash = 0;
+      for (let i = 0; i < rawStr.length; i++) {
+        const char = rawStr.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash;
+      }
+      return Math.abs(hash).toString(16);
+    }
+
+    function downloadStudentGradeFile() {
+      if (!lastResultString) {
+        alert("Tidak ada data nilai untuk diunduh!");
+        return;
+      }
+      try {
+        const resObj = JSON.parse(lastResultString);
+        const blob = new Blob([lastResultString], { type: "text/plain;charset=utf-8" });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = `Nilai_${resObj.name.replace(/\s+/g, "_")}_${resObj.cls.replace(/\s+/g, "_")}.txt`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } catch (err) {
+        alert("Gagal mengunduh file nilai: " + err.message);
+      }
+    }
+
+    function loadExamFromFile(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const fileContent = e.target.result.trim();
+        document.getElementById("stdCodeSoal").value = fileContent;
+        loadExamFromInput();
+      };
+      reader.readAsText(file);
+    }
+
+    function resetExamStateAndExit() {
+      document.getElementById("stdNama").value = "";
+      document.getElementById("stdKelas").value = "";
+      document.getElementById("stdCodeSoal").value = "";
+      const fileInput = document.getElementById("fileSoalInput");
+      if (fileInput) fileInput.value = "";
+      navigateToScreen("screenHome");
+    }
+
+    // --- SCAN SOAL GURU ---
+    function startScanningExamCode() {
+      navigateToScreen("screenQrScanner");
+      initCameraScanner(decodedText => {
+        document.getElementById("stdCodeSoal").value = decodedText;
+        stopQrScanning();
+        navigateToScreen("screenStudentSetup");
+        loadExamFromInput();
+      });
+    }
+
+    function initCameraScanner(onSuccessCallback) {
+      Html5Qrcode.getCameras().then(devices => {
+        if (devices && devices.length > 0) {
+          let cameraId = devices[0].id;
+          const backCamera = devices.find(d => d.label.toLowerCase().includes('back') || d.label.toLowerCase().includes('environment'));
+          if (backCamera) cameraId = backCamera.id;
+
+          qrScannerInstance = new Html5Qrcode("qr-reader");
+          qrScannerInstance.start(
+            cameraId,
+            { fps: 10, qrbox: 250 },
+            onSuccessCallback,
+            errorMessage => {}
+          ).catch(err => {
+            alert("Gagal mengaktifkan Kamera: " + err);
+            stopQrScanning();
+          });
+        } else {
+          alert("Kamera tidak ditemukan!");
+          stopQrScanning();
+        }
+      }).catch(err => {
+        alert("Izin kamera gagal: " + err);
+        stopQrScanning();
+      });
+    }
+
+    function stopQrScanning() {
+      if (qrScannerInstance) {
+        qrScannerInstance.stop().then(() => {
+          qrScannerInstance = null;
+          navigateToScreen("screenStudentSetup");
+        }).catch(err => {
+          navigateToScreen("screenHome");
+        });
+      } else {
+        navigateToScreen("screenHome");
+      }
+    }
+
+    // iOS Guide
+    function checkIosPwaBanner() {
+      const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+      if (isStandalone) return;
+
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+      if (isIOS) {
+        setTimeout(() => {
+          document.getElementById("iosInstallBanner").classList.add("active");
+        }, 4000);
+      }
+    }
+
+    function closeInstallBanner() {
+      document.getElementById("iosInstallBanner").classList.remove("active");
+    }
+
+    // --- INTEGRASI MYBRO2 REDIRECT ---
+    function handleUjianOnlineClick() {
+      document.getElementById("mybroModal").style.display = "flex";
+    }
+
+    function closeMybroModal() {
+      document.getElementById("mybroModal").style.display = "none";
+    }
+
+    function continueInBrowser() {
+      closeMybroModal();
+      navigateToScreen('screenStudentSetup');
+    }
+
+    function launchMybroApp() {
+      const isAndroid = /Android/i.test(navigator.userAgent);
+      if (isAndroid) {
+        // Mencoba membuka aplikasi MYBRO menggunakan Android Intent
+        window.location.href = "intent://#Intent;package=com.example.mybro;end";
+      } else {
+        alert("Aplikasi MYBRO hanya tersedia untuk perangkat Android. Silakan pilih 'Mengerjakan di Browser' jika Anda menggunakan PC atau iPhone/iPad.");
+      }
+    }
+  </script>
+</body>
+</html>
