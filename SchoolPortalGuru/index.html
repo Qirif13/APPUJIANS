@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Panel Dashboard Guru</title>
+  
+  <!-- Manifest & PWA Meta Tags -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#061F14">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="DashboardGuru">
+  <link rel="apple-touch-icon" href="icon-192.png">
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Caching Libraries (Cached by sw.js for offline use) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    :root {
+      --bg-color: #04080F;
+      --card-bg: rgba(16, 28, 23, 0.65);
+      --card-border: rgba(16, 185, 129, 0.1);
+      --font-title: 'Outfit', sans-serif;
+      --font-body: 'Inter', sans-serif;
+      --color-primary: #10B981; /* Emerald Green */
+      --color-success: #10B981;
+      --color-warning: #F59E0B;
+      --color-danger: #EF4444;
+      --color-text: #F1F5F9;
+      --color-muted: #64748B;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: var(--font-body);
+      background-color: var(--bg-color);
+      color: var(--color-text);
+      overflow-x: hidden;
+      min-height: 100vh;
+      position: relative;
+    }
+
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(120px);
+      z-index: 0;
+      opacity: 0.15;
+      pointer-events: none;
+    }
+    .orb-1 { top: -10%; left: -10%; width: 450px; height: 450px; background: linear-gradient(135deg, var(--color-primary), #06b6d4); }
+    .orb-2 { bottom: -10%; right: -10%; width: 450px; height: 450px; background: linear-gradient(135deg, #10B981, #8B5CF6); }
+
+    /* Screen Wrapper */
+    .screen {
+      display: none;
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      min-height: 100vh;
+      padding: 24px;
+    }
+    .screen.active {
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Portal Home Header */
+    .header { text-align: center; margin-bottom: 30px; margin-top: 30px; }
+    .logo { width: 90px; height: 90px; border-radius: 24px; box-shadow: 0 10px 30px rgba(16, 185, 129, 0.25); border: 2px solid rgba(255, 255, 255, 0.1); margin-bottom: 15px; }
+    h1 { font-family: var(--font-title); font-weight: 700; font-size: 26px; margin: 0 0 6px 0; letter-spacing: 0.05em; background: linear-gradient(135deg, #FFF 30%, var(--color-primary) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .subtitle { font-size: 13px; color: var(--color-muted); margin: 0; }
+
+    /* Glass Cards & Forms */
+    .glass-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 24px; padding: 26px; width: 100%; max-width: 900px; margin: 0 auto; backdrop-filter: blur(20px); box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4); }
+    .glass-card h2 { font-family: var(--font-title); color: var(--color-primary); margin-top: 0; font-size: 22px; display: flex; align-items: center; gap: 8px; }
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-size: 11px; font-weight: 600; color: var(--color-muted); text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.05em; }
+    .form-control { width: 100%; background: rgba(15, 23, 42, 0.6); border: 1px solid var(--card-border); border-radius: 12px; padding: 12px; color: #FFF; font-family: var(--font-body); font-size: 14px; outline: none; transition: border-color 0.2s; }
+    .form-control:focus { border-color: var(--color-primary); }
+    
+    .btn-submit { width: 100%; background: var(--color-primary); color: #04080F; font-family: var(--font-title); font-weight: 700; padding: 14px; border: none; border-radius: 12px; font-size: 15px; cursor: pointer; transition: transform 0.1s; }
+    .btn-submit:active { transform: scale(0.98); }
+    .btn-action { width: 100%; padding: 12px; border-radius: 12px; font-family: var(--font-title); font-weight: 600; font-size: 14px; border: none; cursor: pointer; }
+    .btn-action-primary { background: var(--color-primary); color: #04080F; }
+    .btn-action-secondary { background: #1E293B; color: #FFF; border: 1px solid var(--card-border); }
+
+    /* Settings Button */
+    .btn-settings { position: absolute; top: 20px; right: 20px; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--card-border); color: var(--color-text); width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; cursor: pointer; backdrop-filter: blur(10px); }
+
+    /* Tabs for Teacher Dashboard */
+    .tab-menu { display: flex; gap: 8px; margin-bottom: 20px; border-bottom: 1px solid #1E293B; padding-bottom: 8px; }
+    .tab-btn { background: none; border: none; color: var(--color-muted); font-family: var(--font-title); font-weight: 600; font-size: 14px; padding: 8px 14px; cursor: pointer; border-radius: 8px; transition: 0.2s; }
+    .tab-btn.active { background: var(--color-primary); color: #04080F; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* Teacher Stats Cards */
+    .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
+    .stat-box { background: rgba(255,255,255,0.02); border: 1px solid var(--card-border); border-radius: 12px; padding: 14px; text-align: center; }
+    .stat-box h4 { margin: 0; font-size: 10px; color: var(--color-muted); text-transform: uppercase; }
+    .stat-box .value { font-size: 26px; font-weight: bold; color: var(--color-primary); margin-top: 6px; }
+
+    /* Chart Card */
+    .card-chart { background: rgba(255,255,255,0.01); border: 1px solid var(--card-border); border-radius: 16px; padding: 18px; margin-bottom: 24px; }
+    .card-chart h3 { margin: 0 0 14px 0; font-family: var(--font-title); font-size: 16px; color: #FFF; }
+
+    /* Grade List Table */
+    .score-list { width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 12px; }
+    .score-list th { text-align: left; padding: 10px; border-bottom: 2px solid #1E293B; color: var(--color-muted); }
+    .score-list td { padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.04); color: #E2E8F0; }
+
+    /* QR Code Display area */
+    .qr-container { display: flex; flex-direction: column; align-items: center; margin: 20px 0; background: #FFF; padding: 18px; border-radius: 20px; width: fit-content; margin: 20px auto; box-shadow: 0 8px 30px rgba(0,0,0,0.3); }
+    .qr-desc { text-align: center; font-size: 11px; color: #04080F; font-weight: 700; margin-top: 8px; letter-spacing: 0.05em; }
+    #qr-reader { width: 100%; border-radius: 16px; overflow: hidden; margin-bottom: 16px; border: 1px solid var(--card-border); }
+
+    /* Modals */
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(8px); z-index: 200; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.2s; padding: 20px; }
+    .modal-overlay.active { opacity: 1; pointer-events: auto; }
+    .modal { background: rgba(15, 23, 42, 0.95); border: 1px solid var(--card-border); border-radius: 24px; padding: 26px; width: 100%; max-width: 400px; transform: scale(0.95); transition: transform 0.2s; }
+    .modal-overlay.active .modal { transform: scale(1); }
+    .modal-title { font-family: var(--font-title); font-weight: 700; font-size: 18px; margin: 0 0 8px 0; color: var(--color-primary); }
+    .btn-group { display: flex; gap: 10px; margin-top: 20px; }
+  </style>
+</head>
+<body>
+
+  <!-- Decorative Orbs -->
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <!-- ========================================== -->
+  <!-- SCREEN 1: LOGIN ENTER PIN (INITIAL LOAD)   -->
+  <!-- ========================================== -->
+  <div class="screen active" id="screenLoginPin" style="justify-content: center; align-items: center;">
+    <div class="glass-card" style="max-width: 400px; text-align: center;">
+      <img src="icon-512.png" alt="Logo Guru" class="logo" style="box-shadow: 0 10px 30px rgba(16, 185, 129, 0.25);">
+      <h1 id="txtSchoolTitleMain">PORTAL GURU</h1>
+      <p class="subtitle" style="margin-bottom: 24px;">Masukkan PIN Pengawas untuk mengelola ujian:</p>
+      
+      <div class="form-group" style="text-align: left;">
+        <label>PIN Pengawas</label>
+        <input type="password" class="form-control" id="loginPinField" placeholder="Masukkan PIN Pengawas" pattern="[0-9]*" inputmode="numeric" maxlength="8" style="text-align: center; font-size: 20px; letter-spacing: 0.5em;" onkeydown="handlePinKeyPress(event)">
+      </div>
+      
+      <button class="btn-submit" onclick="verifyLoginPinSubmit()">Masuk Dashboard</button>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- SCREEN 2: TEACHER DASHBOARD (MAIN PANEL)   -->
+  <!-- ========================================== -->
+  <div class="screen" id="screenTeacherDashboard">
+    <button class="btn-settings" onclick="promptSettingsPin()">⚙️</button>
+    
+    <div class="glass-card">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--card-border); padding-bottom: 14px;">
+        <h2 style="margin:0;">📊 Panel Dashboard Guru</h2>
+        <button class="btn-action btn-action-secondary" onclick="exitToLogin()" style="max-width: 100px; padding: 8px 16px;">Keluar</button>
+      </div>
+
+      <div class="tab-menu">
+        <button class="tab-btn active" id="tabBtnStat" onclick="switchTeacherTab('stat')">📈 Statistik Nilai</button>
+        <button class="tab-btn" id="tabBtnImport" onclick="switchTeacherTab('import')">📝 Buat Ujian Baru</button>
+      </div>
+
+      <!-- TAB 1: STATISTICS & GRADES -->
+      <div class="tab-content active" id="tContentStat">
+        <!-- Database Sync Status Indicator -->
+        <div id="dbSyncStatusIndicator" style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.2); padding: 10px 14px; border-radius: 10px; font-size: 12px; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between;">
+          <span id="txtDbSyncStatus">📡 Mode Pengumpulan: Lokal (100% Offline)</span>
+          <button class="btn-action" id="btnManualSync" onclick="manualSyncOnlineGrades()" style="display: none; padding: 6px 12px; font-size: 11px; max-width: 130px; background-color: var(--color-primary); color: #04080F; border-radius: 6px; font-weight: bold; border: none; cursor: pointer;">🔄 Sinkron Online</button>
+        </div>
+
+        <div class="stats-row">
+          <div class="stat-box">
+            <h4>Total Masuk</h4>
+            <div class="value" id="statTotal">0</div>
+          </div>
+          <div class="stat-box">
+            <h4>Rata-rata Nilai</h4>
+            <div class="value" id="statRata">0</div>
+          </div>
+          <div class="stat-box">
+            <h4>Lulus KKM (>=75)</h4>
+            <div class="value" id="statLulus" style="color: var(--color-primary);">0</div>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap;">
+          <button class="btn-submit" onclick="startScanningStudentGrades()" style="background-color: var(--color-primary); color:#04080F; margin-bottom: 0; flex: 1; min-width: 180px;">📷 Scan Nilai (Kamera)</button>
+          
+          <label class="btn-submit" style="background-color: #3b82f6; color:#FFF; text-align: center; display: flex; align-items: center; justify-content: center; margin-bottom: 0; flex: 1; min-width: 180px; cursor: pointer; font-family: var(--font-title); font-weight: 700; font-size: 15px; border-radius: 10px; height: 48px; box-sizing: border-box; border: none;">
+            📥 Impor File Nilai
+            <input type="file" id="fileGradesInput" accept=".txt,.json" multiple style="display: none;" onchange="importStudentGradesFromFile(event)">
+          </label>
+        </div>
+
+        <div class="card-chart">
+          <h3>Sebaran Nilai Siswa</h3>
+          <canvas id="chartSebaran" height="180"></canvas>
+        </div>
+
+        <!-- Grade List Table -->
+        <h3 font-family="var(--font-title)" style="margin: 20px 0 10px 0; color: #fff; font-size: 16px;">Daftar Nilai Masuk</h3>
+        <table class="score-list">
+          <thead>
+            <tr>
+              <th>Nama Siswa</th>
+              <th>Kelas</th>
+              <th>Benar/Total</th>
+              <th>Skor</th>
+              <th>Waktu Rekam</th>
+            </tr>
+          </thead>
+          <tbody id="tableScoresBody">
+            <tr>
+              <td colspan="5" style="text-align: center; color: var(--color-muted);">Belum ada data nilai masuk.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div style="display: flex; gap: 12px; margin-top: 20px;">
+          <button class="btn-action btn-action-secondary" onclick="exportScoresCsv()" style="background-color: #1e293b;">📥 Ekspor File Excel (CSV)</button>
+          <button class="btn-action btn-action-secondary" onclick="clearAllScores()" style="background-color: var(--color-danger); max-width: 150px; border:none;">🗑️ Reset Data</button>
+        </div>
+      </div>
+
+      <!-- TAB 2: IMPORT EXAM FROM WORD -->
+      <div class="tab-content" id="tContentImport">
+        <div class="instruction-box" style="background: rgba(16, 185, 129, 0.05); border-left: 4px solid var(--color-primary); padding: 12px; border-radius: 8px; font-size: 12px; color: #cbd5e1; margin-bottom: 16px;">
+          <h4 style="margin:0 0 6px 0; color: var(--color-primary);">💡 Format Soal di MS Word:</h4>
+          Salin dan tempel teks soal dari Microsoft Word Anda. Pastikan format penulisannya persis seperti di bawah ini:
+          <pre style="background: rgba(0,0,0,0.3); padding: 8px; border-radius: 4px; font-size: 11px; margin-top: 6px; overflow-x: auto; color:#fff;">
+1. Siapakah penemu benua Amerika?
+A. Christopher Columbus
+B. Vasco da Gama
+C. Marco Polo
+D. Ferdinand Magellan
+Kunci: A</pre>
+        </div>
+
+        <textarea class="form-control" id="wordInputText" placeholder="Tempel (paste) teks soal dari Word Anda di sini..." style="height: 180px; font-family: monospace; font-size: 12px;" oninput="onWordTextInput()"></textarea>
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 12px;">
+          <span id="txtParsedCount" style="font-size: 13px; color: var(--color-muted);">Terdeteksi: 0 Soal</span>
+          <button class="btn-action btn-action-primary" id="btnGenerateExam" disabled onclick="generateExamCodeFromParsed()" style="max-width: 250px;">⚡ Buat Kode Ujian</button>
+        </div>
+
+        <!-- Exam Code Output Area -->
+        <div id="examCodeOutputArea" style="display: none; margin-top: 24px; border-top: 1px solid var(--card-border); padding-top: 20px;">
+          <h3 style="font-family: var(--font-title); color: var(--color-primary); margin: 0 0 10px 0;">✓ Kode Ujian Berhasil Dibuat!</h3>
+          <p style="font-size: 12px; color: var(--color-muted); margin-bottom: 12px;">Bagikan Kode Teks di bawah ke siswa, atau tampilkan QR Code ini di proyektor kelas:</p>
+          
+          <div class="form-group">
+            <label>Kode Teks Soal (Untuk Di-copy)</label>
+            <div style="display: flex; gap: 8px;">
+              <input type="text" class="form-control" id="txtOutputExamCode" readonly style="font-family: monospace; font-size: 11px;">
+              <button class="btn-action btn-action-primary" onclick="copyExamCodeToClipboard()" style="max-width: 80px; padding: 10px; font-size: 12px;">Salin</button>
+              <button class="btn-action btn-action-secondary" onclick="downloadExamFile()" style="max-width: 120px; padding: 10px; font-size: 12px; background-color: #3b82f6; color:#fff;">Unduh File</button>
+            </div>
+          </div>
+
+          <!-- QR Code Ujian Guru -->
+          <div class="qr-container">
+            <div id="qrcodeSoalGuru"></div>
+            <div class="qr-desc" style="color:#000; font-weight:bold;">PINDAI UNTUK MEMULAI UJIAN</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- SCREEN 3: CAMERA QR SCANNER                -->
+  <!-- ========================================== -->
+  <div class="screen" id="screenQrScanner">
+    <div class="glass-card" style="text-align: center;">
+      <h2 id="scannerScreenTitle">📷 Pindai QR Code</h2>
+      <p class="subtitle" id="scannerScreenDesc" style="margin-bottom: 20px;">Arahkan kamera ke QR Code Nilai di HP Siswa</p>
+      
+      <div id="qr-reader"></div>
+
+      <button class="btn-submit" onclick="stopQrScanning()" style="background-color: var(--color-danger); color: #FFF;">Batal & Kembali</button>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- SYSTEM MODALS                              -->
+  <!-- ========================================== -->
+  <!-- 1. SETTINGS ACCESS PIN MODAL -->
+  <div class="modal-overlay" id="modalPinOverlay">
+    <div class="modal">
+      <h3 class="modal-title">Akses Pengaturan</h3>
+      <p class="subtitle" style="margin-bottom: 20px;">Masukkan PIN Pengawas:</p>
+      <div class="form-group">
+        <input type="password" class="form-control" id="settingsPinField" placeholder="PIN Pengawas" pattern="[0-9]*" inputmode="numeric" maxlength="8" style="text-align: center;">
+      </div>
+      <div class="btn-group">
+        <button class="btn-action btn-action-secondary" onclick="closePinModal()">Batal</button>
+        <button class="btn-action btn-action-primary" onclick="verifySettingsPinSubmit()">Lanjut</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. SETTINGS EDIT CONFIG MODAL -->
+  <div class="modal-overlay" id="modalSettingsOverlay">
+    <div class="modal" style="max-width: 450px;">
+      <h3 class="modal-title">⚙️ Pengaturan Portal & Database</h3>
+      <p class="subtitle" style="margin-bottom: 15px;">Sesuaikan alamat portal dan setelan database:</p>
+      
+      <div class="form-group">
+        <label>Website Sekolah</label>
+        <input type="url" class="form-control" id="urlWebsiteInput" placeholder="https://">
+      </div>
+
+      <div class="form-group">
+        <label>E-Learning / LMS</label>
+        <input type="url" class="form-control" id="urlLmsInput" placeholder="https://">
+      </div>
+
+      <div class="form-group">
+        <label>Nama Sekolah (Judul)</label>
+        <input type="text" class="form-control" id="schoolTitleInput" placeholder="PORTAL HUB SEKOLAH">
+      </div>
+
+      <div style="border-top: 1px solid var(--card-border); margin: 15px 0; padding-top: 15px;">
+        <h4 style="margin: 0 0 10px 0; font-size: 13px; color: var(--color-primary); font-family: var(--font-title);">☁️ Database Online (Supabase)</h4>
+        
+        <div class="form-group">
+          <label>Mode Pengiriman Nilai</label>
+          <select class="form-control" id="syncModeSelect" onchange="toggleSupabaseFields()" style="background: rgba(15, 23, 42, 0.9); cursor: pointer;">
+            <option value="offline">Lokal (100% Offline / QR & File)</option>
+            <option value="hybrid">Hybrid (Otomatis Online / Fallback Offline)</option>
+          </select>
+        </div>
+
+        <div id="supabaseConfigFields" style="display: none;">
+          <div class="form-group">
+            <label>Supabase Project URL</label>
+            <input type="text" class="form-control" id="supabaseUrlInput" placeholder="https://xxxx.supabase.co">
+          </div>
+
+          <div class="form-group">
+            <label>Supabase Anon API Key</label>
+            <input type="password" class="form-control" id="supabaseKeyInput" placeholder="Masukkan Supabase Anon Key">
+          </div>
+        </div>
+      </div>
+
+      <div class="btn-group">
+        <button class="btn-action btn-action-secondary" onclick="closeSettingsModal()">Batal</button>
+        <button class="btn-action btn-action-primary" onclick="saveSettings()">Simpan</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --- APP GLOBAL STATE ---
+    let activeScreenId = "screenLoginPin";
+    const CORRECT_PIN = "99887766";
+    const SECRET_HASH_SALT = "SCHOOL_PORTAL_SECRET_2026";
+
+    // Supabase State
+    let syncMode = "offline";
+    let supabaseUrl = "";
+    let supabaseKey = "";
+    let autoSyncTimer = null;
+
+    // Guru State
+    let parsedWordQuestions = [];
+    let qrScannerInstance = null;
+    let scoreChartInstance = null;
+
+    // --- INITIALIZATION ---
+    window.onload = function() {
+      // Muat data lokal
+      const title = localStorage.getItem("cfg_school_title") || "PORTAL HUB SEKOLAH";
+      document.getElementById("txtSchoolTitleMain").innerText = "PORTAL GURU - " + title;
+
+      // Set default database terpusat sekolah jika belum ada di penyimpan lokal
+      if (!localStorage.getItem("cfg_sync_mode")) {
+        localStorage.setItem("cfg_sync_mode", "hybrid");
+        localStorage.setItem("cfg_supabase_url", "https://mfbossnxodutqkhgromi.supabase.co");
+        localStorage.setItem("cfg_supabase_key", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1mYm9zc254b2R1dHFraGdyb21pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3ODU4NjcsImV4cCI6MjA5NjM2MTg2N30.HXwzDEg9D5Y-UwFCis_3STVodH9pKRWVyr-TNR5ClCw");
+      }
+
+      // Load Supabase Settings
+      syncMode = localStorage.getItem("cfg_sync_mode") || "hybrid";
+      supabaseUrl = localStorage.getItem("cfg_supabase_url") || "https://mfbossnxodutqkhgromi.supabase.co";
+      supabaseKey = localStorage.getItem("cfg_supabase_key") || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1mYm9zc254b2R1dHFraGdyb21pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3ODU4NjcsImV4cCI6MjA5NjM2MTg2N30.HXwzDEg9D5Y-UwFCis_3STVodH9pKRWVyr-TNR5ClCw";
+
+      // Apply settings to UI
+      updateDbSyncStatusUI();
+
+      // Register PWA Service Worker
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register("sw.js")
+          .then(() => console.log("Service Worker Registered"))
+          .catch(err => console.log("Service Worker Registration Failed", err));
+      }
+
+      // Load tabel nilai
+      refreshTeacherScoresTable();
+      
+      // Auto focus input PIN login
+      setTimeout(() => document.getElementById("loginPinField").focus(), 300);
+    };
+
+    // --- NAVIGATION ---
+    function navigateToScreen(screenId) {
+      document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+      const targetScreen = document.getElementById(screenId);
+      if (targetScreen) {
+        targetScreen.classList.add("active");
+        activeScreenId = screenId;
+      }
+    }
+
+    // --- LOGIN VERIFICATION ---
+    function handlePinKeyPress(event) {
+      if (event.key === "Enter") {
+        verifyLoginPinSubmit();
+      }
+    }
+
+    function verifyLoginPinSubmit() {
+      const pinInput = document.getElementById("loginPinField").value;
+      if (pinInput === CORRECT_PIN) {
+        document.getElementById("loginPinField").value = "";
+        navigateToScreen("screenTeacherDashboard");
+        renderDashboardCharts();
+        
+        // Start Auto-Sync if hybrid
+        if (syncMode === "hybrid" && supabaseUrl && supabaseKey) {
+          startAutoSyncInterval();
+        }
+      } else {
+        alert("PIN Pengawas Salah!");
+        document.getElementById("loginPinField").value = "";
+      }
+    }
+
+    function exitToLogin() {
+      stopAutoSyncInterval();
+      navigateToScreen("screenLoginPin");
+      setTimeout(() => document.getElementById("loginPinField").focus(), 300);
+    }
+
+    // --- SETTINGS (PIN LOCKED) ---
+    function promptSettingsPin() {
+      document.getElementById("settingsPinField").value = "";
+      document.getElementById("modalPinOverlay").classList.add("active");
+      setTimeout(() => document.getElementById("settingsPinField").focus(), 300);
+    }
+
+    function closePinModal() {
+      document.getElementById("modalPinOverlay").classList.remove("active");
+    }
+
+    function verifySettingsPinSubmit() {
+      const pin = document.getElementById("settingsPinField").value;
+      if (pin === CORRECT_PIN) {
+        closePinModal();
+        openSettingsModal();
+      } else {
+        alert("PIN Pengawas Salah!");
+        document.getElementById("settingsPinField").value = "";
+      }
+    }
+
+    function openSettingsModal() {
+      document.getElementById("urlWebsiteInput").value = localStorage.getItem("url_website") || "https://smaprestasiprima.sch.id";
+      document.getElementById("urlLmsInput").value = localStorage.getItem("url_lms") || "https://classroom.google.com";
+      document.getElementById("schoolTitleInput").value = localStorage.getItem("cfg_school_title") || "PORTAL HUB SEKOLAH";
+      
+      const currentMode = localStorage.getItem("cfg_sync_mode") || "hybrid";
+      document.getElementById("syncModeSelect").value = currentMode;
+      document.getElementById("supabaseUrlInput").value = localStorage.getItem("cfg_supabase_url") || "https://mfbossnxodutqkhgromi.supabase.co";
+      document.getElementById("supabaseKeyInput").value = localStorage.getItem("cfg_supabase_key") || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1mYm9zc254b2R1dHFraGdyb21pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3ODU4NjcsImV4cCI6MjA5NjM2MTg2N30.HXwzDEg9D5Y-UwFCis_3STVodH9pKRWVyr-TNR5ClCw";
+      
+      toggleSupabaseFields();
+      document.getElementById("modalSettingsOverlay").classList.add("active");
+    }
+
+    function closeSettingsModal() {
+      document.getElementById("modalSettingsOverlay").classList.remove("active");
+    }
+
+    function saveSettings() {
+      const web = document.getElementById("urlWebsiteInput").value.trim();
+      const lms = document.getElementById("urlLmsInput").value.trim();
+      const title = document.getElementById("schoolTitleInput").value.trim() || "PORTAL HUB SEKOLAH";
+      
+      const mode = document.getElementById("syncModeSelect").value;
+      const sUrl = document.getElementById("supabaseUrlInput").value.trim();
+      const sKey = document.getElementById("supabaseKeyInput").value.trim();
+
+      if (mode === "hybrid" && (!sUrl || !sKey)) {
+        alert("Untuk mode Hybrid, Supabase URL dan Key wajib diisi!");
+        return;
+      }
+
+      localStorage.setItem("url_website", web);
+      localStorage.setItem("url_lms", lms);
+      localStorage.setItem("cfg_school_title", title);
+      
+      localStorage.setItem("cfg_sync_mode", mode);
+      localStorage.setItem("cfg_supabase_url", sUrl);
+      localStorage.setItem("cfg_supabase_key", sKey);
+
+      syncMode = mode;
+      supabaseUrl = sUrl;
+      supabaseKey = sKey;
+
+      document.getElementById("txtSchoolTitleMain").innerText = "PORTAL GURU - " + title;
+      
+      updateDbSyncStatusUI();
+      if (syncMode === "hybrid") {
+        startAutoSyncInterval();
+      } else {
+        stopAutoSyncInterval();
+      }
+
+      closeSettingsModal();
+      alert("Pengaturan portal dan database berhasil disimpan!");
+    }
+
+    function toggleSupabaseFields() {
+      const mode = document.getElementById("syncModeSelect").value;
+      const fields = document.getElementById("supabaseConfigFields");
+      if (mode === "hybrid") {
+        fields.style.display = "block";
+      } else {
+        fields.style.display = "none";
+      }
+    }
+
+    // --- GURU: SCANNER INITIATOR ---
+    function startScanningStudentGrades() {
+      navigateToScreen("screenQrScanner");
+      initCameraScanner(decodedText => {
+        try {
+          const res = JSON.parse(decodedText);
+          
+          if (!res.name || !res.cls || res.score === undefined || !res.sig) {
+            throw new Error("Format QR salah");
+          }
+
+          // Verifikasi Tanda Tangan
+          const expectedSig = generateSignature(res.name, res.cls, res.score, res.cor, res.tot);
+          if (res.sig !== expectedSig) {
+            alert("⚠️ PERINGATAN: Tanda tangan QR tidak cocok! Nilai siswa ini kemungkinan telah dimanipulasi.");
+            stopQrScanning();
+            return;
+          }
+
+          // Simpan Nilai secara Lokal
+          const currentScores = JSON.parse(localStorage.getItem("local_grades_db") || "[]");
+          const isExist = currentScores.some(s => s.name.toLowerCase() === res.name.toLowerCase() && s.cls.toLowerCase() === res.cls.toLowerCase());
+          
+          if (isExist) {
+            alert(`Siswa bernama ${res.name} (${res.cls}) sudah terekam nilainya.`);
+          } else {
+            currentScores.push({
+              name: res.name,
+              cls: res.cls,
+              score: res.score,
+              correct: res.cor,
+              total: res.tot,
+              time: new Date().toLocaleTimeString("id-ID", { hour: '2-digit', minute: '2-digit' })
+            });
+            localStorage.setItem("local_grades_db", JSON.stringify(currentScores));
+            
+            if (navigator.vibrate) navigator.vibrate(100);
+            alert(`✓ Berhasil mencatat nilai: ${res.name} (${res.cls}) - Skor: ${res.score}`);
+          }
+          
+          stopQrScanning();
+          refreshTeacherScoresTable();
+          renderDashboardCharts();
+        } catch (err) {
+          alert("Gagal membaca QR Nilai! Pastikan QR Code yang discan adalah QR Nilai siswa yang sah.");
+          stopQrScanning();
+        }
+      });
+    }
+
+    function initCameraScanner(onSuccessCallback) {
+      Html5Qrcode.getCameras().then(devices => {
+        if (devices && devices.length > 0) {
+          let cameraId = devices[0].id;
+          const backCamera = devices.find(d => d.label.toLowerCase().includes('back') || d.label.toLowerCase().includes('environment'));
+          if (backCamera) cameraId = backCamera.id;
+
+          qrScannerInstance = new Html5Qrcode("qr-reader");
+          qrScannerInstance.start(
+            cameraId,
+            { fps: 10, qrbox: 250 },
+            onSuccessCallback,
+            errorMessage => {}
+          ).catch(err => {
+            alert("Gagal mengaktifkan Kamera: " + err);
+            stopQrScanning();
+          });
+        } else {
+          alert("Kamera tidak ditemukan!");
+          stopQrScanning();
+        }
+      }).catch(err => {
+        alert("Izin kamera gagal: " + err);
+        stopQrScanning();
+      });
+    }
+
+    function stopQrScanning() {
+      if (qrScannerInstance) {
+        qrScannerInstance.stop().then(() => {
+          qrScannerInstance = null;
+          navigateToScreen("screenTeacherDashboard");
+        }).catch(err => {
+          navigateToScreen("screenTeacherDashboard");
+        });
+      } else {
+        navigateToScreen("screenTeacherDashboard");
+      }
+    }
+
+    // --- GURU: IMPORT STUDENT GRADE FILES (.TXT/.JSON) ---
+    function importStudentGradesFromFile(event) {
+      const files = event.target.files;
+      if (!files || files.length === 0) return;
+
+      let filesProcessed = 0;
+      let successCount = 0;
+      let dupCount = 0;
+      let failCount = 0;
+
+      const currentScores = JSON.parse(localStorage.getItem("local_grades_db") || "[]");
+
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+          filesProcessed++;
+          try {
+            const fileContent = e.target.result.trim();
+            const res = JSON.parse(fileContent);
+
+            if (!res.name || !res.cls || res.score === undefined || !res.sig) {
+              throw new Error("Format data file nilai tidak valid");
+            }
+
+            // Verifikasi Tanda Tangan Kripto
+            const expectedSig = generateSignature(res.name, res.cls, res.score, res.cor, res.tot);
+            if (res.sig !== expectedSig) {
+              console.warn(`Tanda tangan tidak cocok untuk file: ${file.name}`);
+              failCount++;
+            } else {
+              // Cek duplikasi
+              const isExist = currentScores.some(s => s.name.toLowerCase() === res.name.toLowerCase() && s.cls.toLowerCase() === res.cls.toLowerCase());
+              if (isExist) {
+                dupCount++;
+              } else {
+                currentScores.push({
+                  name: res.name,
+                  cls: res.cls,
+                  score: res.score,
+                  correct: res.cor,
+                  total: res.tot,
+                  time: new Date().toLocaleTimeString("id-ID", { hour: '2-digit', minute: '2-digit' })
+                });
+                successCount++;
+              }
+            }
+          } catch (err) {
+            console.error(`Gagal memproses file ${file.name}:`, err);
+            failCount++;
+          }
+
+          if (filesProcessed === files.length) {
+            localStorage.setItem("local_grades_db", JSON.stringify(currentScores));
+            refreshTeacherScoresTable();
+            renderDashboardCharts();
+
+            event.target.value = ""; // Reset input
+
+            let msg = `✓ Impor file nilai selesai!\n`;
+            msg += `- Berhasil diimpor: ${successCount} nilai\n`;
+            if (dupCount > 0) msg += `- Duplikasi diabaikan: ${dupCount} nilai\n`;
+            if (failCount > 0) msg += `- Ditolak (Kecurangan terdeteksi): ${failCount} file`;
+            alert(msg);
+          }
+        };
+
+        reader.readAsText(file);
+      }
+    }
+
+    // --- GURU: DATABASE SYNC UTILITIES ---
+    function updateDbSyncStatusUI() {
+      const txtStatus = document.getElementById("txtDbSyncStatus");
+      const btnSync = document.getElementById("btnManualSync");
+      if (!txtStatus) return;
+
+      if (syncMode === "hybrid") {
+        txtStatus.innerHTML = `📡 Mode Pengumpulan: <b style="color:var(--color-primary);">Hybrid (Otomatis Online)</b>`;
+        if (btnSync) btnSync.style.display = "block";
+      } else {
+        txtStatus.innerHTML = `📡 Mode Pengumpulan: <b>Lokal (100% Offline)</b>`;
+        if (btnSync) btnSync.style.display = "none";
+      }
+    }
+
+    function startAutoSyncInterval() {
+      stopAutoSyncInterval();
+      if (syncMode === "hybrid" && supabaseUrl && supabaseKey) {
+        syncGradesFromSupabase();
+        autoSyncTimer = setInterval(syncGradesFromSupabase, 10000);
+        console.log("Auto-Sync database started.");
+      }
+    }
+
+    function stopAutoSyncInterval() {
+      if (autoSyncTimer) {
+        clearInterval(autoSyncTimer);
+        autoSyncTimer = null;
+        console.log("Auto-Sync database stopped.");
+      }
+    }
+
+    async function syncGradesFromSupabase() {
+      if (!supabaseUrl || !supabaseKey) return 0;
+      
+      try {
+        const res = await fetch(`${supabaseUrl}/rest/v1/grades`, {
+          method: "GET",
+          headers: {
+            "apikey": supabaseKey,
+            "Authorization": `Bearer ${supabaseKey}`,
+            "Content-Type": "application/json"
+          }
+        });
+        
+        if (!res.ok) throw new Error(`HTTP Error: ${res.status}`);
+        
+        const data = await res.json();
+        if (!Array.isArray(data)) return 0;
+        
+        const currentScores = JSON.parse(localStorage.getItem("local_grades_db") || "[]");
+        let addedCount = 0;
+        
+        data.forEach(item => {
+          const calculatedSig = generateSignature(item.name, item.cls, item.score, item.correct, item.total);
+          if (item.sig !== calculatedSig) {
+            console.warn(`[Supabase Sync] Signature mismatch for student: ${item.name}. Data discarded.`);
+            return;
+          }
+          
+          const isExist = currentScores.some(s => s.name.toLowerCase() === item.name.toLowerCase() && s.cls.toLowerCase() === item.cls.toLowerCase());
+          if (!isExist) {
+            currentScores.push({
+              name: item.name,
+              cls: item.cls,
+              score: item.score,
+              correct: item.correct,
+              total: item.total,
+              time: item.time || new Date().toLocaleTimeString("id-ID", { hour: '2-digit', minute: '2-digit' })
+            });
+            addedCount++;
+          }
+        });
+        
+        if (addedCount > 0) {
+          localStorage.setItem("local_grades_db", JSON.stringify(currentScores));
+          refreshTeacherScoresTable();
+          renderDashboardCharts();
+          console.log(`[Supabase Sync] Synced ${addedCount} new grades.`);
+        }
+        
+        return addedCount;
+      } catch (err) {
+        console.error("[Supabase Sync Error]", err);
+        throw err;
+      }
+    }
+
+    function manualSyncOnlineGrades() {
+      if (syncMode !== "hybrid" || !supabaseUrl || !supabaseKey) {
+        alert("Mode Hybrid Online belum diaktifkan atau dikonfigurasi!");
+        return;
+      }
+      const btn = document.getElementById("btnManualSync");
+      btn.innerText = "⏳ Menyinkronkan...";
+      btn.disabled = true;
+
+      syncGradesFromSupabase()
+        .then((count) => {
+          alert(`✓ Sinkronisasi selesai! Berhasil menarik ${count} data baru dari database online.`);
+        })
+        .catch((err) => {
+          alert(`⚠️ Sinkronisasi gagal: ${err.message}\nPastikan tabel 'grades' sudah dibuat di Supabase Anda.`);
+        })
+        .finally(() => {
+          btn.innerText = "🔄 Sinkron Online";
+          btn.disabled = false;
+        });
+    }
+
+    // --- GURU: TABS ---
+    function switchTeacherTab(tabId) {
+      document.getElementById("tabBtnStat").classList.remove("active");
+      document.getElementById("tabBtnImport").classList.remove("active");
+      document.getElementById("tContentStat").classList.remove("active");
+      document.getElementById("tContentImport").classList.remove("active");
+
+      if (tabId === 'stat') {
+        document.getElementById("tabBtnStat").classList.add("active");
+        document.getElementById("tContentStat").classList.add("active");
+        renderDashboardCharts();
+      } else {
+        document.getElementById("tabBtnImport").classList.add("active");
+        document.getElementById("tContentImport").classList.add("active");
+      }
+    }
+
+    // --- GURU: REFRESH TABLE ---
+    function refreshTeacherScoresTable() {
+      const scores = JSON.parse(localStorage.getItem("local_grades_db") || "[]");
+      const tbody = document.getElementById("tableScoresBody");
+      tbody.innerHTML = "";
+
+      if (scores.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--color-muted);">Belum ada data nilai masuk.</td></tr>`;
+        document.getElementById("statTotal").innerText = 0;
+        document.getElementById("statRata").innerText = 0;
+        document.getElementById("statLulus").innerText = 0;
+        return;
+      }
+
+      let totalScore = 0;
+      let lulusCount = 0;
+
+      scores.forEach(s => {
+        totalScore += s.score;
+        if (s.score >= 75) lulusCount++;
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><b>${s.name}</b></td>
+          <td>${s.cls}</td>
+          <td>${s.correct}/${s.total}</td>
+          <td style="color:${s.score >= 75 ? 'var(--color-primary)':'var(--color-danger)'}; font-weight:bold;">${s.score}</td>
+          <td style="color:var(--color-muted);">${s.time}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      document.getElementById("statTotal").innerText = scores.length;
+      document.getElementById("statRata").innerText = Math.round(totalScore / scores.length);
+      document.getElementById("statLulus").innerText = lulusCount;
+    }
+
+    // --- GURU: CHART DRAWING ---
+    function renderDashboardCharts() {
+      const scores = JSON.parse(localStorage.getItem("local_grades_db") || "[]");
+      const sebaran = [0, 0, 0, 0, 0]; // <60, 60-69, 70-79, 80-89, 90-100
+
+      scores.forEach(s => {
+        const v = s.score;
+        if (v < 60) sebaran[0]++;
+        else if (v < 70) sebaran[1]++;
+        else if (v < 80) sebaran[2]++;
+        else if (v < 90) sebaran[3]++;
+        else sebaran[4]++;
+      });
+
+      if (scoreChartInstance) {
+        scoreChartInstance.destroy();
+      }
+
+      const ctx = document.getElementById("chartSebaran").getContext("2d");
+      scoreChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['<60', '60-69', '70-79', '80-89', '90-100'],
+          datasets: [{
+            label: 'Jumlah Siswa',
+            data: sebaran,
+            backgroundColor: [
+              'rgba(239, 68, 68, 0.75)',  // Red
+              'rgba(245, 158, 11, 0.75)', // Orange
+              'rgba(234, 179, 8, 0.75)',  // Yellow
+              'rgba(16, 185, 129, 0.75)', // Emerald
+              'rgba(16, 185, 129, 0.75)'
+            ],
+            borderColor: 'rgba(16, 185, 129, 1)',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { grid: { color: '#1e293b' }, ticks: { color: '#94a3b8' } },
+            x: { ticks: { color: '#94a3b8' } }
+          }
+        }
+      });
+    }
+
+    // --- GURU: WORD PARSER ENGINE ---
+    function onWordTextInput() {
+      const text = document.getElementById("wordInputText").value;
+      parsedWordQuestions = parseTextQuestions(text);
+
+      document.getElementById("txtParsedCount").innerText = `Terdeteksi: ${parsedWordQuestions.length} Soal`;
+      document.getElementById("btnGenerateExam").disabled = parsedWordQuestions.length === 0;
+    }
+
+    function parseTextQuestions(text) {
+      const lines = text.split("\n");
+      const questions = [];
+      let currentQ = null;
+
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (!line) continue;
+
+        const qMatch = line.match(/^(\d+)[\.\)]\s*(.*)/);
+        if (qMatch) {
+          if (currentQ) questions.push(currentQ);
+          currentQ = {
+            no: qMatch[1],
+            pertanyaan: qMatch[2],
+            options: { A: "", B: "", C: "", D: "" },
+            kunci: ""
+          };
+          continue;
+        }
+
+        const optMatch = line.match(/^([A-D])[\.\)]\s*(.*)/i);
+        if (optMatch && currentQ) {
+          const optLetter = optMatch[1].toUpperCase();
+          currentQ.options[optLetter] = optMatch[2];
+          continue;
+        }
+
+        const keyMatch = line.match(/^(Kunci|Jawaban|Ans|Key)\s*:\s*([A-D])/i);
+        if (keyMatch && currentQ) {
+          currentQ.kunci = keyMatch[2].toUpperCase();
+          continue;
+        }
+
+        if (currentQ && !line.match(/^[A-D][\.\)]/i)) {
+          currentQ.pertanyaan += " " + line;
+        }
+      }
+
+      if (currentQ) questions.push(currentQ);
+      return questions;
+    }
+
+    function generateExamCodeFromParsed() {
+      if (parsedWordQuestions.length === 0) return;
+
+      const missingKey = parsedWordQuestions.filter(q => !q.kunci);
+      if (missingKey.length > 0) {
+        alert(`Ujian gagal dibuat! Ada ${missingKey.length} soal yang belum memiliki Kunci Jawaban. Silakan lengkapi dengan baris 'Kunci: A/B/C/D' di file Word Anda.`);
+        return;
+      }
+
+      // Sisipkan setelan sinkronisasi database online milik guru ke dalam kode ujian!
+      const syncConfig = {
+        mode: localStorage.getItem("cfg_sync_mode") || "offline",
+        url: localStorage.getItem("cfg_supabase_url") || "",
+        key: localStorage.getItem("cfg_supabase_key") || ""
+      };
+
+      const examPayload = {
+        questions: parsedWordQuestions,
+        sync: syncConfig
+      };
+
+      const jsonString = JSON.stringify(examPayload);
+      const base64Code = btoa(unescape(encodeURIComponent(jsonString)));
+
+      document.getElementById("txtOutputExamCode").value = base64Code;
+
+      // Tampilkan QR Code Soal
+      const qrContainer = document.getElementById("qrcodeSoalGuru");
+      qrContainer.innerHTML = "";
+      new QRCode(qrContainer, {
+        text: base64Code,
+        width: 200,
+        height: 200,
+        correctLevel: QRCode.CorrectLevel.M
+      });
+
+      document.getElementById("examCodeOutputArea").style.display = "block";
+      alert("✓ Sukses memproses soal! Kode Ujian & QR Code Ujian berhasil di-generate.");
+    }
+
+    function downloadExamFile() {
+      const code = document.getElementById("txtOutputExamCode").value;
+      if (!code) return;
+
+      const blob = new Blob([code], { type: "text/plain;charset=utf-8" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = `ujian_offline_${new Date().toLocaleDateString("id-ID").replace(/\//g, "-")}.txt`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    function copyExamCodeToClipboard() {
+      const input = document.getElementById("txtOutputExamCode");
+      input.select();
+      input.setSelectionRange(0, 99999);
+      document.execCommand("copy");
+      alert("Kode Ujian berhasil disalin ke clipboard!");
+    }
+
+    function generateSignature(nama, kelas, skor, benar, total) {
+      const rawStr = `${nama}|${kelas}|${skor}|${benar}|${total}|${SECRET_HASH_SALT}`;
+      let hash = 0;
+      for (let i = 0; i < rawStr.length; i++) {
+        const char = rawStr.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash;
+      }
+      return Math.abs(hash).toString(16);
+    }
+
+    function clearAllScores() {
+      if (confirm("Apakah Anda yakin ingin menghapus seluruh rekaman nilai yang telah disimpan di HP ini? Tindakan ini tidak dapat dibatalkan.")) {
+        localStorage.removeItem("local_grades_db");
+        refreshTeacherScoresTable();
+        renderDashboardCharts();
+        alert("Seluruh data nilai dibersihkan.");
+      }
+    }
+
+    // --- CSV EXPORTER ---
+    function exportScoresCsv() {
+      const scores = JSON.parse(localStorage.getItem("local_grades_db") || "[]");
+      if (scores.length === 0) {
+        alert("Tidak ada data nilai untuk diekspor!");
+        return;
+      }
+
+      // Gunakan sep=, agar Excel otomatis memisah kolom pada semua regional setting
+      let csvContent = "data:text/csv;charset=utf-8,sep=,\r\n";
+      csvContent += "Nama Siswa,Kelas,Benar,Total Soal,Skor,Waktu Rekam\n";
+
+      scores.forEach(s => {
+        csvContent += `"${s.name}","${s.cls}",${s.correct},${s.total},${s.score},"${s.time}"\n`;
+      });
+
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", `Rekap_Nilai_Ujian_${new Date().toLocaleDateString("id-ID").replace(/\//g, "-")}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  </script>
+</body>
+</html>
