@@ -374,8 +374,23 @@
       const urlParams = new URLSearchParams(window.location.search);
       const codeParam = urlParams.get('code');
       const namaParam = urlParams.get('nama');
+      const examIdParam = urlParams.get('exam_id');
       
-      if (codeParam) {
+      if (examIdParam) {
+        // Tentukan nama dan kelas dari parameter jika ada
+        if (namaParam) {
+          const match = namaParam.match(/^(.*)\s*\((.*)\)$/);
+          if (match) {
+            document.getElementById("stdNama").value = match[1].trim();
+            document.getElementById("stdKelas").value = match[2].trim();
+          } else {
+            document.getElementById("stdNama").value = namaParam;
+          }
+        }
+        
+        // Load soal online dari Supabase
+        loadExamOnlineFromDb(examIdParam);
+      } else if (codeParam) {
         // Tentukan nama dan kelas dari parameter jika ada
         if (namaParam) {
           // Format namaParam biasanya: "Nama Lengkap (Kelas / Jurusan)"
@@ -453,6 +468,13 @@
         return;
       }
 
+      // Cek jika input adalah EXAM_ID
+      if (rawCode.startsWith("EXAM_ID:")) {
+        const examId = rawCode.replace("EXAM_ID:", "");
+        loadExamOnlineFromDb(examId);
+        return;
+      }
+
       // Cek jika input adalah URL langsung (seperti Google Forms)
       if (rawCode.startsWith("http://") || rawCode.startsWith("https://") || rawCode.includes("forms.gle") || rawCode.includes("docs.google.com")) {
         let targetUrl = rawCode;
@@ -499,6 +521,63 @@
         showQuestion(0);
       } catch (err) {
         alert("Gagal membaca kode soal! Pastikan kode soal yang Anda tempel sudah benar.");
+      }
+    }
+
+    async function loadExamOnlineFromDb(examId) {
+      studentNama = document.getElementById("stdNama").value.trim();
+      studentKelas = document.getElementById("stdKelas").value.trim();
+
+      // Pindahkan ke screen setup untuk mengisi nama jika belum diisi
+      if (!studentNama || !studentKelas) {
+        navigateToScreen("screenStudentSetup");
+        // Simpan examId di input untuk digunakan setelah nama diisi
+        document.getElementById("stdCodeSoal").value = `EXAM_ID:${examId}`;
+        return;
+      }
+
+      // Tampilkan status loading
+      navigateToScreen("screenStudentSetup");
+      const submitBtn = document.querySelector("#screenStudentSetup .btn-submit");
+      if (submitBtn) {
+        submitBtn.innerText = "⏳ Memuat Soal...";
+        submitBtn.disabled = true;
+      }
+
+      try {
+        const res = await fetch(`${supabaseUrl}/rest/v1/exams?id=eq.${examId}`, {
+          method: "GET",
+          headers: {
+            "apikey": supabaseKey,
+            "Authorization": `Bearer ${supabaseKey}`,
+            "Content-Type": "application/json"
+          }
+        });
+
+        if (!res.ok) throw new Error("Gagal mengambil data soal dari database");
+        
+        const data = await res.json();
+        if (!data || data.length === 0) throw new Error("Soal tidak ditemukan");
+
+        const examData = data[0];
+        currentQuestions = examData.questions;
+        if (examData.sync) {
+          syncMode = examData.sync.mode || "hybrid";
+          supabaseUrl = examData.sync.url || supabaseUrl;
+          supabaseKey = examData.sync.key || supabaseKey;
+        }
+
+        currentQuestionIndex = 0;
+        studentAnswers = {};
+        navigateToScreen("screenExamEngine");
+        showQuestion(0);
+      } catch (err) {
+        alert("Gagal memuat soal: " + err.message);
+      } finally {
+        if (submitBtn) {
+          submitBtn.innerText = "Mulai Ujian";
+          submitBtn.disabled = false;
+        }
       }
     }
 
