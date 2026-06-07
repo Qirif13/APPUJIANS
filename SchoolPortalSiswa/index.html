@@ -347,6 +347,8 @@
     let studentAnswers = {};
     let studentNama = "";
     let studentKelas = "";
+    let examSubject = "Umum";
+    let examTeacher = "Umum";
     let lastResultString = ""; 
     let qrScannerInstance = null;
 
@@ -492,6 +494,8 @@
         
         if (examData.questions && Array.isArray(examData.questions)) {
           currentQuestions = examData.questions;
+          examSubject = examData.subject || "Umum";
+          examTeacher = examData.teacher || "Umum";
           // Ekstrak setelan sinkronisasi database dari guru secara otomatis!
           if (examData.sync) {
             syncMode = examData.sync.mode || "hybrid";
@@ -505,6 +509,8 @@
         } else if (Array.isArray(examData)) {
           // Format lama (legacy support)
           currentQuestions = examData;
+          examSubject = "Umum";
+          examTeacher = "Umum";
           syncMode = "hybrid";
           supabaseUrl = "https://mfbossnxodutqkhgromi.supabase.co";
           supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1mYm9zc254b2R1dHFraGdyb21pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3ODU4NjcsImV4cCI6MjA5NjM2MTg2N30.HXwzDEg9D5Y-UwFCis_3STVodH9pKRWVyr-TNR5ClCw";
@@ -560,12 +566,14 @@
         if (!data || data.length === 0) throw new Error("Soal tidak ditemukan");
 
         const examData = data[0];
-        currentQuestions = examData.questions;
-        if (examData.sync) {
-          syncMode = examData.sync.mode || "hybrid";
-          supabaseUrl = examData.sync.url || supabaseUrl;
-          supabaseKey = examData.sync.key || supabaseKey;
-        }
+          currentQuestions = examData.questions;
+          examSubject = examData.subject || "Umum";
+          examTeacher = examData.teacher || "Umum";
+          if (examData.sync) {
+            syncMode = examData.sync.mode || "hybrid";
+            supabaseUrl = examData.sync.url || supabaseUrl;
+            supabaseKey = examData.sync.key || supabaseKey;
+          }
 
         currentQuestionIndex = 0;
         studentAnswers = {};
@@ -656,12 +664,14 @@
       const skor = Math.round((benar / total) * 100);
 
       // Generate Cryptographic Signature untuk mencegah pemalsuan QR Code Nilai
-      const signature = generateSignature(studentNama, studentKelas, skor, benar, total);
+      const signature = generateSignature(studentNama, studentKelas, skor, benar, total, examSubject, examTeacher);
 
       // Data yang dibungkus di dalam QR Code Nilai
       const resultObj = {
         name: studentNama,
         cls: studentKelas,
+        subject: examSubject,
+        teacher: examTeacher,
         score: skor,
         cor: benar,
         tot: total,
@@ -690,6 +700,8 @@
         const payload = {
           name: studentNama,
           cls: studentKelas,
+          subject: examSubject,
+          teacher: examTeacher,
           score: skor,
           correct: benar,
           total: total,
@@ -749,8 +761,17 @@
       });
     }
 
-    function generateSignature(nama, kelas, skor, benar, total) {
-      const rawStr = `${nama}|${kelas}|${skor}|${benar}|${total}|${SECRET_HASH_SALT}`;
+    function generateSignature(nama, kelas, skor, benar, total, examSubject, examTeacher) {
+      const subject = examSubject || "";
+      const teacher = examTeacher || "";
+      let rawStr;
+      if (subject && teacher) {
+        rawStr = `${nama}|${kelas}|${skor}|${benar}|${total}|${subject}|${teacher}|${SECRET_HASH_SALT}`;
+      } else if (subject) {
+        rawStr = `${nama}|${kelas}|${skor}|${benar}|${total}|${subject}|${SECRET_HASH_SALT}`;
+      } else {
+        rawStr = `${nama}|${kelas}|${skor}|${benar}|${total}|${SECRET_HASH_SALT}`;
+      }
       let hash = 0;
       for (let i = 0; i < rawStr.length; i++) {
         const char = rawStr.charCodeAt(i);
@@ -798,6 +819,8 @@
       document.getElementById("stdCodeSoal").value = "";
       const fileInput = document.getElementById("fileSoalInput");
       if (fileInput) fileInput.value = "";
+      examSubject = "Umum";
+      examTeacher = "Umum";
       navigateToScreen("screenHome");
     }
 
