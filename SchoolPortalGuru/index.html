@@ -955,6 +955,9 @@ Kunci: A</pre>
         const line = lines[i].trim();
         if (!line) continue;
 
+        // Mengabaikan baris pembatas seperti --- atau ===
+        if (line.match(/^[\-\=\_\*]+$/)) continue;
+
         const qMatch = line.match(/^(\d+)[\.\)]\s*(.*)/);
         if (qMatch) {
           if (currentQ) questions.push(currentQ);
@@ -974,7 +977,7 @@ Kunci: A</pre>
           continue;
         }
 
-        const keyMatch = line.match(/^(Kunci|Jawaban|Ans|Key)\s*:\s*([A-E])/i);
+        const keyMatch = line.match(/^(Kunci|Jawaban|Jawab|Ans|Key)\s*:?\s*([A-E])/i);
         if (keyMatch && currentQ) {
           currentQ.kunci = keyMatch[2].toUpperCase();
           continue;
