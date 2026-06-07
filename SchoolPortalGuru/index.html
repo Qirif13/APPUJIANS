@@ -992,7 +992,7 @@ Kunci: A</pre>
       return questions;
     }
 
-    function generateExamCodeFromParsed() {
+    async function generateExamCodeFromParsed() {
       if (parsedWordQuestions.length === 0) return;
 
       const missingKey = parsedWordQuestions.filter(q => !q.kunci);
@@ -1017,10 +1017,54 @@ Kunci: A</pre>
       const base64Code = btoa(unescape(encodeURIComponent(jsonString)));
 
       document.getElementById("txtOutputExamCode").value = base64Code;
+      document.getElementById("examCodeOutputArea").style.display = "block";
 
-      // Tampilkan QR Code Soal (Gunakan try-catch agar tidak crash jika soal terlalu banyak/panjang)
+      const qrContainer = document.getElementById("qrcodeSoalGuru");
+      qrContainer.innerHTML = "⏳ Menyiapkan QR Code...";
+
+      // Jika menggunakan database online (hybrid), unggah ke Supabase untuk mendapatkan QR Code berisi link yang sangat pendek & mudah discan
+      if (syncConfig.mode === "hybrid" && syncConfig.url && syncConfig.key) {
+        try {
+          const res = await fetch(`${syncConfig.url}/rest/v1/exams`, {
+            method: "POST",
+            headers: {
+              "apikey": syncConfig.key,
+              "Authorization": `Bearer ${syncConfig.key}`,
+              "Content-Type": "application/json",
+              "Prefer": "return=representation"
+            },
+            body: JSON.stringify({
+              questions: parsedWordQuestions,
+              sync: syncConfig
+            })
+          });
+
+          if (!res.ok) throw new Error("Gagal mengunggah soal");
+          const data = await res.json();
+          const examId = data[0].id;
+          
+          // Generate QR Code berisi Link Ujian Siswa (Sangat Pendek & Mudah Di-scan dari jauh!)
+          const studentUrl = `https://qirif13.github.io/APPUJIANS/SchoolPortalSiswa/?exam_id=${examId}`;
+          
+          qrContainer.innerHTML = "";
+          new QRCode(qrContainer, {
+            text: studentUrl,
+            width: 200,
+            height: 200,
+            correctLevel: QRCode.CorrectLevel.M
+          });
+
+          const qrDesc = document.querySelector(".qr-desc");
+          if (qrDesc) qrDesc.innerHTML = "PINDAI UNTUK MULAI UJIAN (ONLINE QR)";
+          alert("✓ Sukses! Soal ujian berhasil diunggah ke database. QR Code Link telah dibuat.");
+          return;
+        } catch (err) {
+          console.warn("Gagal membuat QR Online, menggunakan fallback QR offline:", err);
+        }
+      }
+
+      // Fallback: Tampilkan QR Code offline (Base64) jika offline atau gagal upload
       try {
-        const qrContainer = document.getElementById("qrcodeSoalGuru");
         qrContainer.innerHTML = "";
         new QRCode(qrContainer, {
           text: base64Code,
@@ -1028,14 +1072,13 @@ Kunci: A</pre>
           height: 200,
           correctLevel: QRCode.CorrectLevel.M
         });
+        const qrDesc = document.querySelector(".qr-desc");
+        if (qrDesc) qrDesc.innerHTML = "PINDAI UNTUK MULAI UJIAN (OFFLINE QR)";
+        alert("✓ Sukses! Kode Ujian & QR Code Ujian berhasil di-generate.");
       } catch (e) {
-        console.warn("QR Code generation failed due to size limit:", e);
-        const qrContainer = document.getElementById("qrcodeSoalGuru");
-        qrContainer.innerHTML = "<div style='color:var(--color-danger); font-size:11px; padding: 15px; font-weight: bold;'>Soal terlalu panjang untuk QR Code.<br>Silakan salin Kode Teks di atas atau unduh file soal.</div>";
+        qrContainer.innerHTML = "<div style='color:var(--color-danger); font-size:11px; padding: 15px; font-weight: bold;'>Soal terlalu panjang untuk QR Code offline.<br>Silakan gunakan Kode Teks di atas atau unduh file soal.</div>";
+        alert("✓ Sukses! Kode Ujian berhasil di-generate (QR Code offline dilewati karena ukuran terlalu besar).");
       }
-
-      document.getElementById("examCodeOutputArea").style.display = "block";
-      alert("✓ Sukses memproses soal! Kode Ujian berhasil di-generate.");
     }
 
     function downloadExamFile() {
