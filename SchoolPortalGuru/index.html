@@ -1018,18 +1018,24 @@ Kunci: A</pre>
 
       document.getElementById("txtOutputExamCode").value = base64Code;
 
-      // Tampilkan QR Code Soal
-      const qrContainer = document.getElementById("qrcodeSoalGuru");
-      qrContainer.innerHTML = "";
-      new QRCode(qrContainer, {
-        text: base64Code,
-        width: 200,
-        height: 200,
-        correctLevel: QRCode.CorrectLevel.M
-      });
+      // Tampilkan QR Code Soal (Gunakan try-catch agar tidak crash jika soal terlalu banyak/panjang)
+      try {
+        const qrContainer = document.getElementById("qrcodeSoalGuru");
+        qrContainer.innerHTML = "";
+        new QRCode(qrContainer, {
+          text: base64Code,
+          width: 200,
+          height: 200,
+          correctLevel: QRCode.CorrectLevel.M
+        });
+      } catch (e) {
+        console.warn("QR Code generation failed due to size limit:", e);
+        const qrContainer = document.getElementById("qrcodeSoalGuru");
+        qrContainer.innerHTML = "<div style='color:var(--color-danger); font-size:11px; padding: 15px; font-weight: bold;'>Soal terlalu panjang untuk QR Code.<br>Silakan salin Kode Teks di atas atau unduh file soal.</div>";
+      }
 
       document.getElementById("examCodeOutputArea").style.display = "block";
-      alert("✓ Sukses memproses soal! Kode Ujian & QR Code Ujian berhasil di-generate.");
+      alert("✓ Sukses memproses soal! Kode Ujian berhasil di-generate.");
     }
 
     function downloadExamFile() {
