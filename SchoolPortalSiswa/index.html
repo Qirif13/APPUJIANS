@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Portal Siswa Hub</title>
+  <title>dashboard siswa</title>
   
   <!-- Manifest & PWA Meta Tags -->
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#0B132B">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="PortalSiswa">
+  <meta name="apple-mobile-web-app-title" content="dashboard siswa">
   <link rel="apple-touch-icon" href="icon-192.png">
 
   <!-- Google Fonts -->
@@ -45,6 +45,8 @@
       padding: 0;
       font-family: var(--font-body);
       background-color: var(--bg-color);
+      background-image: radial-gradient(circle at top, #041859 0%, var(--bg-color) 100%);
+      background-attachment: fixed;
       color: var(--color-text);
       overflow-x: hidden;
       min-height: 100vh;
@@ -78,7 +80,7 @@
 
     /* Portal Home Header */
     .header { text-align: center; margin-bottom: 30px; margin-top: 30px; }
-    .logo { width: 90px; height: 90px; border-radius: 24px; box-shadow: 0 10px 30px rgba(56, 189, 248, 0.25); border: 2px solid rgba(255, 255, 255, 0.1); margin-bottom: 15px; }
+    .logo { width: 90px; height: 90px; margin-bottom: 15px; filter: drop-shadow(0 10px 20px rgba(56, 189, 248, 0.2)); }
     h1 { font-family: var(--font-title); font-weight: 700; font-size: 26px; margin: 0 0 6px 0; letter-spacing: 0.05em; background: linear-gradient(135deg, #FFF 30%, var(--color-primary) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     .subtitle { font-size: 13px; color: var(--color-muted); margin: 0; }
     
@@ -140,6 +142,166 @@
     .install-text h4 { margin: 0 0 4px 0; color: var(--color-primary); font-size: 13px; }
     .install-text p { margin: 0; color: #cbd5e1; }
     .btn-close-banner { background: none; border: none; color: var(--color-muted); font-size: 18px; cursor: pointer; }
+
+    @keyframes pulse {
+      0% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.1); opacity: 0.8; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    /* Game Memory Cards styling */
+    .game-card {
+      aspect-ratio: 1;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: bold;
+      color: transparent;
+      cursor: pointer;
+      user-select: none;
+      transition: background-color 0.2s, transform 0.2s;
+      padding: 4px;
+      text-align: center;
+      word-break: break-word;
+      line-height: 1.2;
+    }
+    .game-card.flipped {
+      background: rgba(56, 189, 248, 0.15);
+      border-color: var(--color-primary);
+      color: #FFF;
+      transform: rotateY(180deg);
+    }
+    .game-card.matched {
+      background: rgba(16, 185, 129, 0.2);
+      border-color: var(--color-success);
+      color: var(--color-success);
+      cursor: default;
+      pointer-events: none;
+    }
+
+    /* Game tabs menu */
+    .tab-btn {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--card-border);
+      color: var(--color-muted);
+      font-family: var(--font-title);
+      font-weight: 600;
+      font-size: 13px;
+      padding: 8px 16px;
+      cursor: pointer;
+      border-radius: 10px;
+      transition: background-color 0.2s, color 0.2s;
+    }
+    .tab-btn.active {
+      background: var(--color-primary);
+      color: #080C1E;
+      border-color: var(--color-primary);
+    }
+
+    /* Word Search styling */
+    .wordsearch-grid {
+      display: grid;
+      grid-template-columns: repeat(10, 1fr);
+      gap: 4px;
+      max-width: 320px;
+      margin: 0 auto;
+      user-select: none;
+    }
+    .wordsearch-cell {
+      aspect-ratio: 1;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--card-border);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: bold;
+      color: #FFF;
+      cursor: pointer;
+      transition: background-color 0.15s, transform 0.1s;
+    }
+    .wordsearch-cell:active {
+      transform: scale(0.9);
+    }
+    .wordsearch-cell.selected {
+      background: rgba(245, 158, 11, 0.25);
+      border-color: var(--color-warning);
+      color: var(--color-warning);
+    }
+    .wordsearch-cell.found {
+      background: rgba(16, 185, 129, 0.25);
+      border-color: var(--color-success);
+      color: var(--color-success);
+      cursor: default;
+      pointer-events: none;
+    }
+    .wordsearch-words-list {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 12px;
+      max-width: 320px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .wordsearch-word {
+      font-size: 10px;
+      padding: 4px 8px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
+      color: var(--color-muted);
+      font-weight: 600;
+    }
+    .wordsearch-word.found {
+      text-decoration: line-through;
+      color: var(--color-success);
+      background: rgba(16, 185, 129, 0.15);
+      border-color: var(--color-success);
+    }
+
+    /* Word Fall styling */
+    .wordfall-container {
+      position: relative;
+      width: 100%;
+      height: 250px;
+      background: rgba(8, 12, 30, 0.5);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      overflow: hidden;
+      margin: 0 auto 12px auto;
+      max-width: 340px;
+    }
+    .wordfall-bubble {
+      position: absolute;
+      background: rgba(56, 189, 248, 0.15);
+      border: 1px solid var(--color-primary);
+      border-radius: 20px;
+      padding: 6px 12px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #FFF;
+      white-space: nowrap;
+      transform: translateX(-50%);
+      pointer-events: none;
+      box-shadow: 0 4px 15px rgba(56, 189, 248, 0.15);
+      text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+    }
+    .wordfall-stats {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      max-width: 340px;
+      margin: 0 auto 8px auto;
+      color: #FFF;
+      font-weight: 600;
+    }
   </style>
 </head>
 <body>
@@ -154,7 +316,7 @@
   <div class="screen active" id="screenHome">
     <div class="header">
       <img src="icon-512.png" alt="Logo Sekolah" class="logo">
-      <h1 id="txtSchoolTitle">PORTAL SISWA HUB</h1>
+      <h1 id="txtSchoolTitle">DASHBOARD SISWA</h1>
       <p class="subtitle" id="txtDateTime">Selamat Datang di Pusat Belajar & Ujian Online</p>
     </div>
 
@@ -278,8 +440,101 @@
       </div>
 
       <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 15px;">
+        <button class="btn-action" id="btnPlayGame" onclick="showEducationalGame()" style="background-color: #f59e0b; color: #080c1e; width: 100%; font-weight: bold; margin-bottom: 0;">🎮 Game Edukatif (Mengisi Waktu)</button>
         <button class="btn-action btn-action-primary" id="btnDownloadGrade" onclick="downloadStudentGradeFile()" style="background-color: #3b82f6; color: #FFF; width: 100%;">📥 Unduh File Nilai (.txt)</button>
         <button class="btn-submit" onclick="resetExamStateAndExit()" style="background-color: #334155; color: #FFF; margin-top: 0;">Keluar ke Beranda</button>
+      </div>
+
+      <!-- Game Edukatif Container (Initially Hidden) -->
+      <div id="gameContainer" style="display: none; margin-top: 20px; border-top: 1px solid var(--card-border); padding-top: 20px; text-align: center;">
+        <h3 style="font-family: var(--font-title); color: var(--color-warning); margin: 0 0 12px 0; font-size: 18px; display: flex; align-items: center; justify-content: center; gap: 6px;">🎮 Game Edukatif: Asah Otak</h3>
+        
+        <!-- Game Selection Tabs -->
+        <div style="display: flex; gap: 6px; justify-content: center; margin-bottom: 16px; flex-wrap: wrap;">
+          <button class="tab-btn active" id="btnTabGameMemori" onclick="switchGameTab('memori')" style="font-size: 11px; padding: 6px 12px; height: auto;">🧩 Memori</button>
+          <button class="tab-btn" id="btnTabGameScramble" onclick="switchGameTab('scramble')" style="font-size: 11px; padding: 6px 12px; height: auto;">📝 Tebak Kata</button>
+          <button class="tab-btn" id="btnTabGameKuis" onclick="switchGameTab('kuis')" style="font-size: 11px; padding: 6px 12px; height: auto;">⚡ Kuis Kilat</button>
+          <button class="tab-btn" id="btnTabGameCariKata" onclick="switchGameTab('carikata')" style="font-size: 11px; padding: 6px 12px; height: auto;">🔍 Cari Kata</button>
+          <button class="tab-btn" id="btnTabGameHujanKata" onclick="switchGameTab('hujankata')" style="font-size: 11px; padding: 6px 12px; height: auto;">🎯 Hujan Kata</button>
+        </div>
+
+        <!-- GAME 1: MEMORI -->
+        <div id="gameContentMemori" style="display: block;">
+          <p style="font-size: 11px; color: var(--color-muted); margin-bottom: 14px;">Cocokkan istilah pelajaran dengan pasangannya!</p>
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; width: 100%; max-width: 320px; margin: 0 auto;" id="gameBoard"></div>
+          <div style="margin-top: 14px; font-size: 12px; display: flex; justify-content: space-between; max-width: 320px; margin: 14px auto 0 auto; color: var(--color-text);">
+            <span>Langkah: <b id="gameMoves">0</b></span>
+            <span>Pasangan: <b id="gameMatches">0 / 8</b></span>
+          </div>
+          <button class="btn-action btn-action-secondary" onclick="initMemoryGame()" style="margin-top: 12px; max-width: 150px; padding: 8px 12px; font-size: 12px; display: inline-block;">🔄 Ulangi Game</button>
+        </div>
+
+        <!-- GAME 2: SCRAMBLE -->
+        <div id="gameContentScramble" style="display: none;">
+          <p style="font-size: 11px; color: var(--color-muted); margin-bottom: 14px;">Susun huruf acak berikut menjadi kata yang benar!</p>
+          <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--card-border); border-radius: 12px; padding: 16px; max-width: 320px; margin: 0 auto;">
+            <div id="scrambleWordDisplay" style="font-size: 24px; font-weight: bold; letter-spacing: 0.2em; color: var(--color-primary); margin-bottom: 12px;">W O R D</div>
+            <input type="text" id="scrambleInput" class="form-control" placeholder="Ketik tebakan Anda" style="text-align: center; text-transform: uppercase; font-weight: bold; margin-bottom: 12px;">
+            <button class="btn-submit" onclick="checkScrambleGuess()" style="padding: 10px; background-color: var(--color-primary); color: #080c1e; font-weight: bold; margin-bottom: 8px; border: none; cursor: pointer;">Kirim Jawaban</button>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn-action btn-action-secondary" onclick="skipScrambleWord()" style="padding: 8px; font-size: 12px; flex: 1;">Lewati</button>
+              <button class="btn-action btn-action-secondary" onclick="initScrambleGame()" style="padding: 8px; font-size: 12px; flex: 1;">Ulangi</button>
+            </div>
+            <div id="scrambleFeedback" style="margin-top: 10px; font-size: 12px; font-weight: bold;"></div>
+          </div>
+          <div style="margin-top: 14px; font-size: 12px; display: flex; justify-content: space-between; max-width: 320px; margin: 14px auto 0 auto; color: var(--color-text);">
+            <span>Skor: <b id="scrambleScore">0</b></span>
+            <span>Kata ke: <b id="scrambleRound">1 / 5</b></span>
+          </div>
+        </div>
+
+        <!-- GAME 3: KUIS KILAT -->
+        <div id="gameContentKuis" style="display: none;">
+          <p style="font-size: 11px; color: var(--color-muted); margin-bottom: 14px;">Jawab kuis pelajaran secepat dan setepat mungkin!</p>
+          <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--card-border); border-radius: 12px; padding: 16px; max-width: 320px; margin: 0 auto; text-align: left;">
+            <div id="kuisQuestionText" style="font-size: 13px; font-weight: bold; color: #FFF; margin-bottom: 14px; min-height: 40px; line-height: 1.4;">Pertanyaan kuis...</div>
+            <div id="kuisOptionsContainer" style="display: flex; flex-direction: column; gap: 8px;">
+              <!-- Option buttons will be generated here -->
+            </div>
+            <div id="kuisFeedback" style="margin-top: 12px; font-size: 12px; font-weight: bold; text-align: center;"></div>
+          </div>
+          <div style="margin-top: 14px; font-size: 12px; display: flex; justify-content: space-between; max-width: 320px; margin: 14px auto 0 auto; color: var(--color-text);">
+            <span>Benar: <b id="kuisScore">0</b></span>
+            <span>Soal ke: <b id="kuisRound">1 / 5</b></span>
+          </div>
+          <button class="btn-action btn-action-secondary" onclick="initKuisGame()" style="margin-top: 12px; max-width: 150px; padding: 8px 12px; font-size: 12px; display: block; margin-left: auto; margin-right: auto;">🔄 Ulangi Kuis</button>
+        </div>
+
+        <!-- GAME 4: CARI KATA -->
+        <div id="gameContentCariKata" style="display: none;">
+          <p style="font-size: 11px; color: var(--color-muted); margin-bottom: 14px;">Temukan kata-kata tersembunyi di dalam grid huruf!</p>
+          <div class="wordsearch-grid" id="wordsearchGrid"></div>
+          <div class="wordsearch-words-list" id="wordsearchWordsList"></div>
+          <div style="margin-top: 14px; font-size: 12px; display: flex; justify-content: space-between; max-width: 320px; margin: 14px auto 0 auto; color: var(--color-text);">
+            <span>Menemukan: <b id="carikataFound">0 / 4</b></span>
+            <span>Waktu: <b id="carikataTimer">0s</b></span>
+          </div>
+          <button class="btn-action btn-action-secondary" onclick="initCariKataGame()" style="margin-top: 12px; max-width: 150px; padding: 8px 12px; font-size: 12px; display: block; margin-left: auto; margin-right: auto;">🔄 Ulangi Game</button>
+        </div>
+
+        <!-- GAME 5: HUJAN KATA -->
+        <div id="gameContentHujanKata" style="display: none;">
+          <div class="wordfall-stats">
+            <span>Skor: <b id="wordfallScore">0</b></span>
+            <span>Nyawa: <b id="wordfallLives" style="color: var(--color-danger);">❤️ ❤️ ❤️</b></span>
+          </div>
+          <div class="wordfall-container" id="wordfallContainer">
+            <div id="wordfallStartOverlay" style="position: absolute; top:0; left:0; width:100%; height:100%; background:rgba(8,12,30,0.85); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; z-index:10;">
+              <span style="font-size: 32px;">🎯</span>
+              <span style="font-size: 12px; text-align:center; padding:0 20px; color:#cbd5e1;">Ketik kata/jawaban matematika dari bubble yang jatuh secepat mungkin!</span>
+              <button class="btn-submit" onclick="startWordFallGame()" style="width:auto; padding:8px 24px; font-size:13px; margin-top:8px;">Mulai Bermain</button>
+            </div>
+          </div>
+          <div style="max-width: 340px; margin: 0 auto; display: flex; gap: 8px;">
+            <input type="text" id="wordfallInput" class="form-control" placeholder="Ketik jawaban di sini..." style="text-align: center;" disabled>
+            <button class="btn-submit" id="btnWordfallSubmit" onclick="checkWordfallInputDirect()" style="width: auto; padding: 0 16px; font-size: 13px;" disabled>Kirim</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -352,10 +607,16 @@
     let lastResultString = ""; 
     let qrScannerInstance = null;
 
+    // Anti-Cheat State
+    let examCheatLimit = 0;
+    let examUnlockPinHash = "";
+    let studentCheatCount = 0;
+    let isScreenLocked = false;
+
     // --- INITIALIZATION ---
     window.onload = function() {
       // Muat data lokal
-      const title = localStorage.getItem("cfg_school_title") || "PORTAL SISWA HUB";
+      const title = localStorage.getItem("cfg_school_title") || "DASHBOARD SISWA";
       document.getElementById("txtSchoolTitle").innerText = title;
 
       // Update waktu
@@ -415,6 +676,34 @@
           loadExamFromInput();
         }, 500);
       }
+
+      // Monitor tab switching / blur events
+      window.addEventListener("blur", handleStudentTabOut);
+      document.addEventListener("visibilitychange", () => {
+        if (document.hidden) {
+          handleStudentTabOut();
+        }
+      });
+
+      // Monitor fullscreen change events
+      document.addEventListener("fullscreenchange", handleFullscreenChange);
+      document.addEventListener("webkitfullscreenchange", handleFullscreenChange);
+      document.addEventListener("mozfullscreenchange", handleFullscreenChange);
+      document.addEventListener("MSFullscreenChange", handleFullscreenChange);
+
+      // Mencegah klik kanan, salin/tempel, dan seleksi teks selama ujian
+      document.addEventListener("contextmenu", e => {
+        if (activeScreenId === "screenExamEngine") e.preventDefault();
+      });
+      document.addEventListener("copy", e => {
+        if (activeScreenId === "screenExamEngine") e.preventDefault();
+      });
+      document.addEventListener("paste", e => {
+        if (activeScreenId === "screenExamEngine") e.preventDefault();
+      });
+      document.addEventListener("selectstart", e => {
+        if (activeScreenId === "screenExamEngine") e.preventDefault();
+      });
     };
 
     function updateDateTime() {
@@ -496,6 +785,9 @@
           currentQuestions = examData.questions;
           examSubject = examData.subject || "Umum";
           examTeacher = examData.teacher || "Umum";
+          examCheatLimit = examData.cheatLimit || (examData.sync ? examData.sync.cheatLimit : 0) || 0;
+          examUnlockPinHash = examData.unlockPinHash || (examData.sync ? examData.sync.unlockPinHash : "") || "";
+
           // Ekstrak setelan sinkronisasi database dari guru secara otomatis!
           if (examData.sync) {
             syncMode = examData.sync.mode || "hybrid";
@@ -511,6 +803,8 @@
           currentQuestions = examData;
           examSubject = "Umum";
           examTeacher = "Umum";
+          examCheatLimit = 0;
+          examUnlockPinHash = "";
           syncMode = "hybrid";
           supabaseUrl = "https://mfbossnxodutqkhgromi.supabase.co";
           supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1mYm9zc254b2R1dHFraGdyb21pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3ODU4NjcsImV4cCI6MjA5NjM2MTg2N30.HXwzDEg9D5Y-UwFCis_3STVodH9pKRWVyr-TNR5ClCw";
@@ -523,8 +817,11 @@
         // Mulai ujian
         currentQuestionIndex = 0;
         studentAnswers = {};
+        studentCheatCount = 0;
+        isScreenLocked = false;
         navigateToScreen("screenExamEngine");
         showQuestion(0);
+        enterExamFullscreen();
       } catch (err) {
         alert("Gagal membaca kode soal! Pastikan kode soal yang Anda tempel sudah benar.");
       }
@@ -566,19 +863,24 @@
         if (!data || data.length === 0) throw new Error("Soal tidak ditemukan");
 
         const examData = data[0];
-          currentQuestions = examData.questions;
-          examSubject = examData.subject || "Umum";
-          examTeacher = examData.teacher || "Umum";
-          if (examData.sync) {
-            syncMode = examData.sync.mode || "hybrid";
-            supabaseUrl = examData.sync.url || supabaseUrl;
-            supabaseKey = examData.sync.key || supabaseKey;
-          }
+        currentQuestions = examData.questions;
+        examSubject = examData.subject || "Umum";
+        examTeacher = examData.teacher || "Umum";
+        examCheatLimit = examData.cheatLimit || (examData.sync ? examData.sync.cheatLimit : 0) || 0;
+        examUnlockPinHash = examData.unlockPinHash || (examData.sync ? examData.sync.unlockPinHash : "") || "";
+        if (examData.sync) {
+          syncMode = examData.sync.mode || "hybrid";
+          supabaseUrl = examData.sync.url || supabaseUrl;
+          supabaseKey = examData.sync.key || supabaseKey;
+        }
 
         currentQuestionIndex = 0;
         studentAnswers = {};
+        studentCheatCount = 0;
+        isScreenLocked = false;
         navigateToScreen("screenExamEngine");
         showQuestion(0);
+        enterExamFullscreen();
       } catch (err) {
         alert("Gagal memuat soal: " + err.message);
       } finally {
@@ -588,6 +890,21 @@
         }
       }
     }
+    function formatMathAndFractions(text) {
+      if (!text) return "";
+      let formatted = text;
+      // 1. Exponents: x^2 -> x<sup>2</sup>, x^(2x) -> x<sup>2x</sup>
+      formatted = formatted.replace(/([a-zA-Z0-9]+)\^([a-zA-Z0-9]+)/g, '$1<sup>$2</sup>');
+      formatted = formatted.replace(/([a-zA-Z0-9]+)\^\(([^)]+)\)/g, '$1<sup>$2</sup>');
+      
+      // 2. Subscripts: x_1 -> x<sub>1</sub>, x_(12) -> x<sub>12</sub>
+      formatted = formatted.replace(/([a-zA-Z0-9]+)_([a-zA-Z0-9]+)/g, '$1<sub>$2</sub>');
+      formatted = formatted.replace(/([a-zA-Z0-9]+)_\(([^)]+)\)/g, '$1<sub>$2</sub>');
+      
+      // 3. Square roots: sqrt(25) -> &radic;25
+      formatted = formatted.replace(/sqrt\(([^)]+)\)/g, '&radic;$1');
+      return formatted;
+    }
 
     function showQuestion(index) {
       if (index < 0 || index >= currentQuestions.length) return;
@@ -596,7 +913,7 @@
       document.getElementById("txtExamProgress").innerText = `Soal ${index + 1} dari ${currentQuestions.length}`;
       
       const q = currentQuestions[index];
-      document.getElementById("txtQuestion").innerText = `${q.no}. ${q.pertanyaan}`;
+      document.getElementById("txtQuestion").innerHTML = `${q.no}. ${formatMathAndFractions(q.pertanyaan)}`;
 
       const optionsContainer = document.getElementById("optionsContainer");
       optionsContainer.innerHTML = "";
@@ -608,7 +925,7 @@
           if (studentAnswers[q.no] === opt) {
             btn.classList.add("selected");
           }
-          btn.innerText = `${opt}. ${q.options[opt]}`;
+          btn.innerHTML = `${opt}. ${formatMathAndFractions(q.options[opt])}`;
           btn.onclick = () => selectStudentAnswer(q.no, opt);
           optionsContainer.appendChild(btn);
         }
@@ -650,21 +967,22 @@
         }
       }
 
-      // Hitung Skor
+      // Hitung Skor dan Daftar Pemahaman Soal
       let benar = 0;
-      currentQuestions.forEach(q => {
+      const correctsList = currentQuestions.map(q => {
         const correctKey = q.kunci ? q.kunci.toUpperCase() : "";
         const studentAns = studentAnswers[q.no] ? studentAnswers[q.no].toUpperCase() : "";
-        if (correctKey && studentAns === correctKey) {
-          benar++;
-        }
-      });
+        const isCorrect = (correctKey && studentAns === correctKey);
+        if (isCorrect) benar++;
+        return isCorrect ? "1" : "0";
+      }).join(",");
 
       const total = currentQuestions.length;
       const skor = Math.round((benar / total) * 100);
 
       // Generate Cryptographic Signature untuk mencegah pemalsuan QR Code Nilai
       const signature = generateSignature(studentNama, studentKelas, skor, benar, total, examSubject, examTeacher);
+      const signatureWithCorrects = `${signature}|${correctsList}`;
 
       // Data yang dibungkus di dalam QR Code Nilai
       const resultObj = {
@@ -676,7 +994,8 @@
         cor: benar,
         tot: total,
         ans: Object.entries(studentAnswers).map(([k,v]) => `${k}:${v}`).join(","),
-        sig: signature
+        cht: studentCheatCount,
+        sig: signatureWithCorrects
       };
 
       const resultString = JSON.stringify(resultObj);
@@ -705,8 +1024,9 @@
           score: skor,
           correct: benar,
           total: total,
+          cheat_count: studentCheatCount,
           time: new Date().toLocaleTimeString("id-ID", { hour: '2-digit', minute: '2-digit' }),
-          sig: signature
+          sig: signatureWithCorrects
         };
 
         fetch(`${supabaseUrl}/rest/v1/grades`, {
@@ -821,6 +1141,17 @@
       if (fileInput) fileInput.value = "";
       examSubject = "Umum";
       examTeacher = "Umum";
+      document.getElementById("gameContainer").style.display = "none";
+      
+      // Bersihkan timer/game yang sedang berjalan
+      if (wordsearchTimerInterval) clearInterval(wordsearchTimerInterval);
+      if (wordfallGameRunning) endWordfallGame(false);
+
+      if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement) {
+        const exitFs = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen || document.msExitFullscreen;
+        if (exitFs) exitFs.call(document);
+      }
+      
       navigateToScreen("screenHome");
     }
 
@@ -915,6 +1246,1210 @@
         alert("Aplikasi MYBRO hanya tersedia untuk perangkat Android. Silakan pilih 'Mengerjakan di Browser' jika Anda menggunakan PC atau iPhone/iPad.");
       }
     }
+
+    // --- ANTI-CHEAT HANDLERS ---
+    function handleStudentTabOut() {
+      if (activeScreenId !== "screenExamEngine" || isScreenLocked) return;
+      if (examCheatLimit <= 0) return;
+
+      studentCheatCount++;
+      if (studentCheatCount >= examCheatLimit) {
+        lockExamScreen();
+      } else {
+        alert(`⚠️ PERINGATAN KECURANGAN!\n\nAnda terdeteksi keluar dari aplikasi / pindah tab / keluar layar penuh ujian sebanyak ${studentCheatCount} kali.\n\nBatas toleransi maksimal: ${examCheatLimit} kali. Jika melewati batas ini, layar ujian Anda akan terkunci secara otomatis!`);
+        const isFullscreen = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
+        if (!isFullscreen) {
+          showFullscreenRequiredOverlay();
+        }
+      }
+    }
+
+    function lockExamScreen() {
+      isScreenLocked = true;
+      document.getElementById("txtMaxCheatLimit").innerText = examCheatLimit;
+      document.getElementById("unlockPinField").value = "";
+      document.getElementById("lockscreenOverlay").style.display = "flex";
+      document.getElementById("fullscreenRequiredOverlay").style.display = "none";
+      if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+      if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement) {
+        const exitFs = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen || document.msExitFullscreen;
+        if (exitFs) exitFs.call(document);
+      }
+    }
+
+    function enterExamFullscreen() {
+      const docEl = document.documentElement;
+      const requestFs = docEl.requestFullscreen || docEl.webkitRequestFullscreen || docEl.mozRequestFullScreen || docEl.msRequestFullscreen;
+      if (requestFs) {
+        requestFs.call(docEl).catch(err => {
+          console.warn("Fullscreen request failed:", err);
+          showFullscreenRequiredOverlay();
+        });
+      }
+    }
+
+    function handleFullscreenChange() {
+      if (activeScreenId !== "screenExamEngine" || isScreenLocked) return;
+      const isFullscreen = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
+      if (!isFullscreen) {
+        handleStudentTabOut();
+      }
+    }
+
+    function showFullscreenRequiredOverlay() {
+      document.getElementById("fullscreenRequiredOverlay").style.display = "flex";
+    }
+
+    function activateFullscreenAndStart() {
+      const docEl = document.documentElement;
+      const requestFs = docEl.requestFullscreen || docEl.webkitRequestFullscreen || docEl.mozRequestFullScreen || docEl.msRequestFullscreen;
+      if (requestFs) {
+        requestFs.call(docEl).then(() => {
+          document.getElementById("fullscreenRequiredOverlay").style.display = "none";
+        }).catch(err => {
+          alert("Gagal masuk layar penuh: " + err.message);
+        });
+      }
+    }
+
+    function verifyUnlockPin() {
+      const pinVal = document.getElementById("unlockPinField").value.trim();
+      if (!pinVal) {
+        alert("Harap masukkan PIN Pengawas!");
+        return;
+      }
+
+      const hashedPin = hashPin(pinVal);
+
+      // Gunakan PIN ujian yang terenkripsi, atau gunakan master PIN pengawas portal sekolah '99887766' sebagai cadangan darurat
+      if (hashedPin === examUnlockPinHash || pinVal === "99887766") {
+        isScreenLocked = false;
+studentCheatCount = 0;
+        document.getElementById("lockscreenOverlay").style.display = "none";
+        if (navigator.vibrate) navigator.vibrate(100);
+        alert("✓ Ujian Telah Dibuka Kembali!\nLayar ujian Anda berhasil dibuka. Silakan lanjutkan pengerjaan.");
+      } else {
+        alert("⚠️ PIN Pengawas Salah!");
+        document.getElementById("unlockPinField").value = "";
+      }
+    }
+
+    // --- GAME EDUKATIF DILENGKAPI DATA PELAJARAN DINAMIS ---
+    function getSubjectGameData() {
+      const subject = (examSubject || "umum").toLowerCase();
+      
+      const data = {
+        matematika: {
+          memori: [], // Di-generate secara dinamis
+          scramble: ["ALGEBRA", "GEOMETRI", "MATRIKS", "STATISTIKA", "TRIGONOMETRI", "KALKULUS", "DIAGRAM", "PECAHAN", "INTEGRAL", "DIAMETER", "PERSAMAAN", "SUDUT", "LOGARITMA", "EKSPONEN", "LIMIT", "FUNGSI", "VEKTOR", "GRAFIK", "PROBABILITAS", "ARITMATIKA", "DERET", "MATEMATIKA", "ALGORITMA", "DIMENSI", "KUBUS", "BALOK", "TABUNG", "KERUCUT", "LINGKARAN", "SEGITIGA", "TRAPESIUM"],
+          kuis: [] // Di-generate secara dinamis
+        },
+        fisika: {
+          memori: [
+            { matchId: 1, text: "Gaya" }, { matchId: 1, text: "Newton" },
+            { matchId: 2, text: "Daya" }, { matchId: 2, text: "Watt" },
+            { matchId: 3, text: "Arus Listrik" }, { matchId: 3, text: "Ampere" },
+            { matchId: 4, text: "Hambatan" }, { matchId: 4, text: "Ohm" },
+            { matchId: 5, text: "Tegangan" }, { matchId: 5, text: "Volt" },
+            { matchId: 6, text: "Energi" }, { matchId: 6, text: "Joule" },
+            { matchId: 7, text: "Tekanan" }, { matchId: 7, text: "Pascal" },
+            { matchId: 8, text: "Frekuensi" }, { matchId: 8, text: "Hertz" },
+            { matchId: 9, text: "Massa" }, { matchId: 9, text: "Kilogram" },
+            { matchId: 10, text: "Suhu" }, { matchId: 10, text: "Kelvin" },
+            { matchId: 11, text: "Panjang" }, { matchId: 11, text: "Meter" },
+            { matchId: 12, text: "Waktu" }, { matchId: 12, text: "Sekon" },
+            { matchId: 13, text: "Hukum I Newton" }, { matchId: 13, text: "Inersia" },
+            { matchId: 14, text: "Gravitasi Bumi" }, { matchId: 14, text: "9.8 m/s²" },
+            { matchId: 15, text: "Kecepatan" }, { matchId: 15, text: "Jarak / Waktu" },
+            { matchId: 16, text: "Cepat Cahaya" }, { matchId: 16, text: "3x10⁸ m/s" },
+            { matchId: 17, text: "Usaha" }, { matchId: 17, text: "Gaya x Jarak" },
+            { matchId: 18, text: "Kerapatan" }, { matchId: 18, text: "Massa / Volume" }
+          ],
+          scramble: ["GRAVITASI", "ENERGI", "VEKTOR", "OPTIK", "TEKANAN", "FREKUENSI", "MAGNET", "GAYA", "KINEMATIKA", "TERMODINAMIKA", "ELEKTROMAGNET", "KONDUKSI", "KONVEKSI", "RADIASI", "PERCEPATAN", "RESONANSI", "AMPLITUDO", "VISKOSITAS", "MOMENTUM", "IMPULS", "DILATASI", "GELOMBANG", "REFLEKSI", "REFRAKSI", "DIFRAKSI", "INTERFERENSI", "FOTON", "ATOM", "TERMAL", "HIDROSTATIS"],
+          kuis: [
+            { q: "Satuan SI untuk gaya adalah...", o: ["Joule", "Pascal", "Newton", "Watt"], a: "Newton" },
+            { q: "Hukum gerak benda dirumuskan oleh...", o: ["Einstein", "Newton", "Galileo", "Faraday"], a: "Newton" },
+            { q: "Alat pengukur suhu adalah...", o: ["Barometer", "Termometer", "Voltmeter", "Amperemeter"], a: "Termometer" },
+            { q: "Cepat rambat cahaya adalah...", o: ["300.000 km/s", "3.000 km/s", "30.000 km/s", "3.000.000 km/s"], a: "300.000 km/s" },
+            { q: "Energi kinetik adalah energi yang dimiliki benda karena...", o: ["Posisinya", "Bentuknya", "Geraknya", "Suhunya"], a: "Geraknya" },
+            { q: "Perpindahan panas melalui aliran zat perantaranya disebut...", o: ["Konduksi", "Konveksi", "Radiasi", "Evaporasi"], a: "Konveksi" },
+            { q: "Alat pengukur tekanan udara luar adalah...", o: ["Barometer", "Manometer", "Termometer", "Voltmeter"], a: "Barometer" },
+            { q: "Hambatan listrik kawat penghantar berbanding lurus dengan...", o: ["Panjang kawat", "Luas penampang", "Tegangan", "Kuat arus"], a: "Panjang kawat" },
+            { q: "Cermin yang dapat mengumpulkan berkas cahaya (konvergen) adalah...", o: ["Cermin Cekung", "Cermin Cembung", "Cermin Datar", "Prisma"], a: "Cermin Cekung" },
+            { q: "Bunyi pantul yang terdengar hampir bersamaan dengan bunyi asli disebut...", o: ["Gaung", "Gema", "Desah", "Nada"], a: "Gaung" }
+          ]
+        },
+        kimia: {
+          memori: [
+            { matchId: 1, text: "H2O" }, { matchId: 1, text: "Air" },
+            { matchId: 2, text: "CO2" }, { matchId: 2, text: "Karbon Dioksida" },
+            { matchId: 3, text: "NaCl" }, { matchId: 3, text: "Garam Dapur" },
+            { matchId: 4, text: "Asam" }, { matchId: 4, text: "pH < 7" },
+            { matchId: 5, text: "Basa" }, { matchId: 5, text: "pH > 7" },
+            { matchId: 6, text: "O2" }, { matchId: 6, text: "Oksigen" },
+            { matchId: 7, text: "Fe" }, { matchId: 7, text: "Besi" },
+            { matchId: 8, text: "Elektron" }, { matchId: 8, text: "Negatif" },
+            { matchId: 9, text: "Proton" }, { matchId: 9, text: "Positif" },
+            { matchId: 10, text: "C6H12O6" }, { matchId: 10, text: "Glukosa" },
+            { matchId: 11, text: "CH4" }, { matchId: 11, text: "Metana" },
+            { matchId: 12, text: "HCl" }, { matchId: 12, text: "Asam Klorida" },
+            { matchId: 13, text: "NaOH" }, { matchId: 13, text: "Natrium Hidroksida" },
+            { matchId: 14, text: "Au" }, { matchId: 14, text: "Emas" },
+            { matchId: 15, text: "H2SO4" }, { matchId: 15, text: "Asam Sulfat" }
+          ],
+          scramble: ["ATOM", "MOLEKUL", "REAKSI", "SENYAWA", "ASAM", "BASA", "LARUTAN", "PERIODIK", "VALENSI", "KATALIS", "HIDROGEN", "OKSIGEN", "ISOTOP", "ELEKTRON", "NEUTRON", "PROTON", "HIDROLISIS", "POLIMER", "TITRASI", "KOLOID", "KATION", "ANION", "KVALENSI", "AEROSOL", "EMULSI"],
+          kuis: [
+            { q: "Berapakah nilai pH untuk larutan netral (air murni)?", o: ["0", "5", "7", "14"], a: "7" },
+            { q: "Senyawa kimia NaCl adalah nama ilmiah untuk...", o: ["Gula", "Garam Dapur", "Soda Kue", "Cuka"], a: "Garam Dapur" },
+            { q: "Lambang unsur besi dalam tabel periodik adalah...", o: ["B", "Be", "Fe", "F"], a: "Fe" },
+            { q: "Zat yang mempercepat laju reaksi tanpa ikut bereaksi disebut...", o: ["Katalis", "Reaktan", "Produk", "Inhibitor"], a: "Katalis" },
+            { q: "Bagian terkecil dari suatu unsur yang masih memiliki sifat unsur tersebut adalah...", o: ["Proton", "Molekul", "Atom", "Elektron"], a: "Atom" },
+            { q: "Zat tunggal yang tidak dapat dibagi lagi secara kimia biasa disebut...", o: ["Unsur", "Senyawa", "Campuran", "Larutan"], a: "Unsur" },
+            { q: "Partikel penyusun inti atom yang bermuatan netral adalah...", o: ["Proton", "Neutron", "Elektron", "Positron"], a: "Neutron" },
+            { q: "Ikatan kimia yang terbentuk akibat serah terima elektron disebut...", o: ["Ikatan Kovalen", "Ikatan Ion", "Ikatan Logam", "Ikatan Hidrogen"], a: "Ikatan Ion" },
+            { q: "Gas yang paling melimpah di atmosfer bumi adalah...", o: ["Oksigen", "Nitrogen", "Karbon Dioksida", "Argon"], a: "Nitrogen" },
+            { q: "Asam asetat adalah nama ilmiah untuk...", o: ["Cuka dapur", "Garam", "Soda api", "Gula merah"], a: "Cuka dapur" }
+          ]
+        },
+        biologi: {
+          memori: [
+            { matchId: 1, text: "Fotosintesis" }, { matchId: 1, text: "Klorofil" },
+            { matchId: 2, text: "DNA" }, { matchId: 2, text: "Genetika" },
+            { matchId: 3, text: "Jantung" }, { matchId: 3, text: "Darah" },
+            { matchId: 4, text: "Paru-paru" }, { matchId: 4, text: "Respirasi" },
+            { matchId: 5, text: "Sel" }, { matchId: 5, text: "Unit Hidup" },
+            { matchId: 6, text: "Mitokondria" }, { matchId: 6, text: "Energi Sel" },
+            { matchId: 7, text: "Mamalia" }, { matchId: 7, text: "Menyusui" },
+            { matchId: 8, text: "Herbivora" }, { matchId: 8, text: "Daun" },
+            { matchId: 9, text: "Kloroplas" }, { matchId: 9, text: "Fotosintesis" },
+            { matchId: 10, text: "Nukleus" }, { matchId: 10, text: "Otak Sel" },
+            { matchId: 11, text: "Ribosom" }, { matchId: 11, text: "Protein" },
+            { matchId: 12, text: "Lisosom" }, { matchId: 12, text: "Pencernaan" },
+            { matchId: 13, text: "Stomata" }, { matchId: 13, text: "Mulut Daun" },
+            { matchId: 14, text: "Hemoglobin" }, { matchId: 14, text: "Ikat Oksigen" },
+            { matchId: 15, text: "Ginjal" }, { matchId: 15, text: "Saring Darah" }
+          ],
+          scramble: ["BAKTERI", "GENETIKA", "EKOSISTEM", "AMFIBI", "KLOROFIL", "EVOLUSI", "ANATOMI", "SEL", "TAKSONOMI", "REPRODUKSI", "KLOROPLAS", "MITOKONDRIA", "ORGANISME", "BIOSFER", "POPULASI", "KOMUNITAS", "SITOPLASMA", "NUKLEUS", "MUTASI", "SIMBIOSIS", "VIRUS", "JAMUR", "PARASIT", "KROMOSOM", "ALVEOLUS"],
+          kuis: [
+            { q: "Bagian sel tumbuhan yang berfungsi melakukan fotosintesis adalah...", o: ["Kloroplas", "Mitokondria", "Ribosom", "Vakuola"], a: "Kloroplas" },
+            { q: "Organ pencernaan lambung berfungsi untuk...", o: ["Menyerap air", "Mencerna makanan secara kimiawi", "Menghasilkan empedu", "Menyerap nutrisi"], a: "Mencerna makanan secara kimiawi" },
+            { q: "Penyakit anemia disebabkan oleh kekurangan...", o: ["Kalsium", "Zat Besi", "Vitamin C", "Yodium"], a: "Zat Besi" },
+            { q: "Hewan pemakan daging disebut...", o: ["Karnivora", "Herbivora", "Omnivora", "Detritivora"], a: "Karnivora" },
+            { q: "Bidang biologi yang mempelajari pewarisan sifat makhluk hidup disebut...", o: ["Fisiologi", "Genetika", "Taksonomi", "Ekologi"], a: "Genetika" },
+            { q: "Tempat pertukaran gas oksigen dan karbon dioksida di paru-paru terjadi di...", o: ["Alveolus", "Bronkus", "Trakea", "Bronkiolus"], a: "Alveolus" },
+            { q: "Zat hijau pada daun tumbuhan dinamakan...", o: ["Klorofil", "Karoten", "Sitosol", "Kromoplas"], a: "Klorofil" },
+            { q: "Simbiosis komensalisme adalah hubungan di mana...", o: ["Satu untung satu rugi", "Dua-duanya untung", "Satu untung satu netral", "Dua-duanya rugi"], a: "Satu untung satu netral" },
+            { q: "Organ pencernaan manusia yang berfungsi menyerap sari makanan adalah...", o: ["Usus Halus", "Usus Besar", "Lambung", "Kerongkongan"], a: "Usus Halus" },
+            { q: "Organel sel yang berfungsi sebagai tempat respirasi sel dan penghasil energi adalah...", o: ["Mitokondria", "Nukleus", "Lisosom", "Badan Golgi"], a: "Mitokondria" }
+          ]
+        },
+        sejarah: {
+          memori: [
+            { matchId: 1, text: "Proklamasi" }, { matchId: 1, text: "17-08-1945" },
+            { matchId: 2, text: "Soekarno" }, { matchId: 2, text: "Presiden 1" },
+            { matchId: 3, text: "Gadjah Mada" }, { matchId: 3, text: "Sumpah Palapa" },
+            { matchId: 4, text: "VOC" }, { matchId: 4, text: "Belanda" },
+            { matchId: 5, text: "Majapahit" }, { matchId: 5, text: "Raden Wijaya" },
+            { matchId: 6, text: "Sumpah Pemuda" }, { matchId: 6, text: "28-10-1928" },
+            { matchId: 7, text: "Pancasila" }, { matchId: 7, text: "5 Dasar" },
+            { matchId: 8, text: "Hasanuddin" }, { matchId: 8, text: "Ayam Jantan" },
+            { matchId: 9, text: "Budi Utomo" }, { matchId: 9, text: "20 Mei 1908" },
+            { matchId: 10, text: "Supersemar" }, { matchId: 10, text: "11 Maret 1966" },
+            { matchId: 11, text: "Borobudur" }, { matchId: 11, text: "Syailendra" },
+            { matchId: 12, text: "Hatta" }, { matchId: 12, text: "Wapres 1" },
+            { matchId: 13, text: "Kutai" }, { matchId: 13, text: "Mulawarman" },
+            { matchId: 14, text: "Diponegoro" }, { matchId: 14, text: "1825-1830" },
+            { matchId: 15, text: "Sriwijaya" }, { matchId: 15, text: "Dapunta Hyang" }
+          ],
+          scramble: ["PROKLAMASI", "KOLONIAL", "REVOLUSI", "KERAJAAN", "PERANG", "INDONESIA", "NASIONAL", "SEJARAH", "PAHLAWAN", "PRASASTI", "CANDI", "KEMERDEKAAN", "REFORMASI", "DIKTATOR", "MONARKI", "KONSTITUSI", "SUMPAH", "PEMUDA", "NUSTANTARA", "KOLONISASI", "KRONOLOGI", "ARKEOLOGI", "HISTORIA", "MAJAPAHIT", "SRIWIJAYA"],
+          kuis: [
+            { q: "Pada tanggal berapakah teks Proklamasi Indonesia dibacakan?", o: ["1 Juni 1945", "17 Agustus 1945", "18 Agustus 1945", "20 Mei 1945"], a: "17 Agustus 1945" },
+            { q: "Siapakah yang menjahit bendera Sang Saka Merah Putih pertama kali?", o: ["Fatmawati", "Megawati", "Kartini", "Dewi Sartika"], a: "Fatmawati" },
+            { q: "Dimanakah lokasi penculikan Soekarno-Hatta sebelum proklamasi?", o: ["Linggarjati", "Rengasdengklok", "Borobudur", "Kalijati"], a: "Rengasdengklok" },
+            { q: "Patih terkenal dari Kerajaan Majapahit yang mengucapkan Sumpah Palapa adalah...", o: ["Hayam Wuruk", "Gadjah Mada", "Ken Arok", "Raden Wijaya"], a: "Gadjah Mada" },
+            { q: "Kerajaan Hindu tertua di Indonesia adalah...", o: ["Kutai", "Tarumanegara", "Sriwijaya", "Singasari"], a: "Kutai" },
+            { q: "Bapak Proklamator Indonesia adalah...", o: ["Soekarno & Hatta", "Soekarno & Soeharto", "Hatta & Syahrir", "Yamin & Soepomo"], a: "Soekarno & Hatta" },
+            { q: "Sumpah Pemuda diikrarkan pada tanggal...", o: ["20 Mei 1908", "28 Oktober 1928", "17 Agustus 1945", "10 November 1945"], a: "28 Oktober 1928" },
+            { q: "Organisasi pergerakan nasional pertama di Indonesia adalah...", o: ["Sarekat Islam", "Budi Utomo", "Indische Partij", "PNI"], a: "Budi Utomo" },
+            { q: "Perang Diponegoro berlangsung dari tahun...", o: ["1800 - 1805", "1825 - 1830", "1942 - 1945", "1908 - 1912"], a: "1825 - 1830" },
+            { q: "Siapa raja terbesar dari kerajaan Singasari?", o: ["Ken Arok", "Kertanegara", "Raden Wijaya", "Anusapati"], a: "Kertanegara" }
+          ]
+        },
+        ips: {
+          memori: [
+            { matchId: 1, text: "Kebutuhan" }, { matchId: 1, text: "Ekonomi" },
+            { matchId: 2, text: "Uang" }, { matchId: 2, text: "Alat Tukar" },
+            { matchId: 3, text: "Peta" }, { matchId: 3, text: "Kartografi" },
+            { matchId: 4, text: "Kompas" }, { matchId: 4, text: "Arah Mata Angin" },
+            { matchId: 5, text: "Ekspor" }, { matchId: 5, text: "Jual ke Luar" },
+            { matchId: 6, text: "Impor" }, { matchId: 6, text: "Beli dari Luar" },
+            { matchId: 7, text: "Barter" }, { matchId: 7, text: "Tukar Barang" },
+            { matchId: 8, text: "Produsen" }, { matchId: 8, text: "Pembuat Barang" },
+            { matchId: 9, text: "Konsumen" }, { matchId: 9, text: "Pemakai Barang" },
+            { matchId: 10, text: "Distributor" }, { matchId: 10, text: "Penyalur Barang" },
+            { matchId: 11, text: "Sosial" }, { matchId: 11, text: "Interaksi" },
+            { matchId: 12, text: "Geografi" }, { matchId: 12, text: "Bumi" },
+            { matchId: 13, text: "Inflasi" }, { matchId: 13, text: "Harga Naik" },
+            { matchId: 14, text: "Pasar" }, { matchId: 14, text: "Tukar Menukar" },
+            { matchId: 15, text: "Sensus" }, { matchId: 15, text: "Cacah Jiwa" }
+          ],
+          scramble: ["SOSIOLOGI", "GEOGRAFI", "EKONOMI", "PRODUSEN", "KONSUMEN", "DISTRIBUSI", "INFLASI", "INVESTASI", "KARTOGRAFI", "KOMPAS", "ATLAS", "DEMOGRAFI", "INTERAKSI", "KOMUNIKASI", "SOSIALISASI", "ASIMILASI", "AKULTURASI", "NORMA", "KONFLIK", "INTEGRASI", "KOPERASI", "PASAR", "MONOPOLI", "BARTER", "TRANSAKSI"],
+          kuis: [
+            { q: "Kegiatan menyalurkan barang dari produsen ke konsumen disebut...", o: ["Konsumsi", "Produksi", "Distribusi", "Asimilasi"], a: "Distribusi" },
+            { q: "Garis khayal pada peta yang membujur dari kutub utara ke kutub selatan disebut...", o: ["Garis Lintang", "Garis Bujur", "Garis Khatulistiwa", "Garis Weber"], a: "Garis Bujur" },
+            { q: "Ilmu yang mempelajari tentang peta disebut...", o: ["Demografi", "Kartografi", "Geologi", "Sosiologi"], a: "Kartografi" },
+            { q: "Negara kepulauan terbesar di dunia adalah...", o: ["Filipina", "Jepang", "Indonesia", "Inggris"], a: "Indonesia" },
+            { q: "Alat tukar resmi yang digunakan saat ini adalah...", o: ["Emas", "Barter", "Uang", "Saham"], a: "Uang" },
+            { q: "Kegiatan menggunakan atau mengurangi nilai guna barang disebut...", o: ["Produksi", "Konsumsi", "Distribusi", "Investasi"], a: "Konsumsi" },
+            { q: "Kenaikan harga barang secara umum dan terus menerus dinamakan...", o: ["Deflasi", "Inflasi", "Devaluasi", "Depresiasi"], a: "Inflasi" },
+            { q: "Interaksi sosial asosiatif berbentuk...", o: ["Kerja sama", "Pertikaian", "Persaingan", "Kontravensi"], a: "Kerja sama" },
+            { q: "Pertemuan antara permintaan dan penawaran terjadi di...", o: ["Bank", "Kantor", "Pasar", "Pelabuhan"], a: "Pasar" },
+            { q: "Buku kumpulan peta bumi dinamakan...", o: ["Globe", "Atlas", "Kamus", "Ensiklopedi"], a: "Atlas" }
+          ]
+        },
+        english: {
+          memori: [
+            { matchId: 1, text: "Go" }, { matchId: 1, text: "Went" },
+            { matchId: 2, text: "Eat" }, { matchId: 2, text: "Ate" },
+            { matchId: 3, text: "Run" }, { matchId: 3, text: "Ran" },
+            { matchId: 4, text: "See" }, { matchId: 4, text: "Saw" },
+            { matchId: 5, text: "Write" }, { matchId: 5, text: "Wrote" },
+            { matchId: 6, text: "Speak" }, { matchId: 6, text: "Spoke" },
+            { matchId: 7, text: "Buy" }, { matchId: 7, text: "Bought" },
+            { matchId: 8, text: "Do" }, { matchId: 8, text: "Did" },
+            { matchId: 9, text: "Make" }, { matchId: 9, text: "Made" },
+            { matchId: 10, text: "Sleep" }, { matchId: 10, text: "Slept" },
+            { matchId: 11, text: "Take" }, { matchId: 11, text: "Took" },
+            { matchId: 12, text: "Read" }, { matchId: 12, text: "Read" },
+            { matchId: 13, text: "Sing" }, { matchId: 13, text: "Sang" },
+            { matchId: 14, text: "Swim" }, { matchId: 14, text: "Swam" },
+            { matchId: 15, text: "Drink" }, { matchId: 15, text: "Drank" }
+          ],
+          scramble: ["ENGLISH", "VOCABULARY", "GRAMMAR", "LANGUAGE", "SPEAKING", "WRITING", "READING", "LISTENING", "PRONOUN", "ADJECTIVE", "PREPOSITION", "CONJUNCTION", "SENTENCE", "VERB", "NOUN", "ADVERB", "TENSE", "SPELLING", "DICTATION", "CONVERSATION", "ALPHABET", "SYLLABLE", "PARAGRAPH", "PHRASE", "IDIOM"],
+          kuis: [
+            { q: "What is the past tense of the verb 'go'?", o: ["Gone", "Goed", "Went", "Going"], a: "Went" },
+            { q: "Which word is a synonym for 'happy'?", o: ["Sad", "Glad", "Angry", "Tired"], a: "Glad" },
+            { q: "Choose the correct preposition: She is interested ___ learning English.", o: ["at", "on", "in", "for"], a: "in" },
+            { q: "Identify the noun in this sentence: The little dog barked all night.", o: ["little", "dog", "barked", "all"], a: "dog" },
+            { q: "What is the opposite of 'generous'?", o: ["Kind", "Mean", "Polite", "Helpful"], a: "Mean" },
+            { q: "Bentuk lampau (Verb 2) dari 'write' adalah...", o: ["Written", "Write", "Wrote", "Writing"], a: "Wrote" },
+            { q: "Translate to English: 'Saya sedang makan apel'", o: ["I eat an apple", "I eating apple", "I am eating an apple", "I am eat apple"], a: "I am eating an apple" },
+            { q: "Which of these is a fruit?", o: ["Carrot", "Potato", "Banana", "Cabbage"], a: "Banana" },
+            { q: "The opposite of 'cheap' is...", o: ["Easy", "Expensive", "Heavy", "Dirty"], a: "Expensive" },
+            { q: "She ___ to school every day.", o: ["go", "goes", "going", "went"], a: "goes" }
+          ]
+        },
+        indonesia: {
+          memori: [
+            { matchId: 1, text: "Subjek" }, { matchId: 1, text: "Pelaku" },
+            { matchId: 2, text: "Predikat" }, { matchId: 2, text: "Tindakan" },
+            { matchId: 3, text: "Sinonim" }, { matchId: 3, text: "Persamaan" },
+            { matchId: 4, text: "Antonim" }, { matchId: 4, text: "Lawan Kata" },
+            { matchId: 5, text: "Pantun" }, { matchId: 5, text: "Sajak a-b-a-b" },
+            { matchId: 6, text: "Puisi" }, { matchId: 6, text: "Bait" },
+            { matchId: 7, text: "KBBI" }, { matchId: 7, text: "Kamus Besar" },
+            { matchId: 8, text: "Majas" }, { matchId: 8, text: "Gaya Bahasa" },
+            { matchId: 9, text: "Denotasi" }, { matchId: 9, text: "Sebenarnya" },
+            { matchId: 10, text: "Konotasi" }, { matchId: 10, text: "Kiasan" },
+            { matchId: 11, text: "Homofon" }, { matchId: 11, text: "Bunyi Sama" },
+            { matchId: 12, text: "Homograf" }, { matchId: 12, text: "Tulisan Sama" },
+            { matchId: 13, text: "Objek" }, { matchId: 13, text: "Penerima" },
+            { matchId: 14, text: "Keterangan" }, { matchId: 14, text: "Waktu/Tempat" },
+            { matchId: 15, text: "SPOK" }, { matchId: 15, text: "Struktur Kalimat" }
+          ],
+          scramble: ["SINONIM", "ANTONIM", "PARAGRAF", "MEMBACA", "MENULIS", "PUISI", "MAJAS", "SAJAK", "PANTUN", "DIKSI", "ALINEA", "RINGKASAN", "IKHTISAR", "KATA", "KALIMAT", "SPASIAL", "FONOLOGI", "MORFOLOGI", "SINTAKSIS", "SEMANTIK", "PRAMATIK", "MENGARANG", "REDAKSI", "SASTRAWAN", "DEKLAMASI"],
+          kuis: [
+            { q: "Persamaan kata dalam bahasa Indonesia disebut dengan istilah...", o: ["Antonim", "Sinonim", "Homofon", "Akronim"], a: "Sinonim" },
+            { q: "Lawan kata dalam bahasa Indonesia disebut...", o: ["Sinonim", "Antonim", "Homograf", "Metafora"], a: "Antonim" },
+            { q: "Sajak pantun yang benar adalah memiliki pola...", o: ["a-a-a-a", "a-b-a-b", "a-b-b-a", "a-a-b-b"], a: "a-b-a-b" },
+            { q: "Kepanjangan dari KBBI yang benar adalah...", o: ["Kamus Baca Bahasa Indonesia", "Kamus Besar Bahasa Indonesia", "Koleksi Buku Bahasa Indonesia", "Kamus Baku Bahasa Indonesia"], a: "Kamus Besar Bahasa Indonesia" },
+            { q: "Majas personifikasi adalah majas yang mengibaratkan benda mati seperti...", o: ["Hewan", "Tumbuhan", "Manusia", "Dewa"], a: "Manusia" },
+            { q: "Ide pokok dalam sebuah paragraf disebut...", o: ["Gagasan Utama", "Kalimat Penjelas", "Alur Cerita", "Tema"], a: "Gagasan Utama" },
+            { q: "Karya sastra melayu lama berbentuk puisi berima a-a-a-a disebut...", o: ["Pantun", "Syair", "Gurindam", "Karmina"], a: "Syair" },
+            { q: "Kata dasar dari 'mempertanggungjawabkan' adalah...", o: ["Tanggung", "Tanggung jawab", "Pertanggung", "Jawab"], a: "Tanggung jawab" },
+            { q: "Kalimat yang subjeknya melakukan pekerjaan disebut kalimat...", o: ["Aktif", "Pasif", "Tunggal", "Majemuk"], a: "Aktif" },
+            { q: "Kata penunjuk waktu di bawah ini adalah...", o: ["Kemarin", "Di sana", "Oleh karena itu", "Sangat"], a: "Kemarin" }
+          ]
+        },
+        pjok: {
+          memori: [
+            { matchId: 1, text: "Sepak Bola" }, { matchId: 1, text: "11 Pemain" },
+            { matchId: 2, text: "Bola Basket" }, { matchId: 2, text: "5 Pemain" },
+            { matchId: 3, text: "Bulutangkis" }, { matchId: 3, text: "Raket" },
+            { matchId: 4, text: "Kiper" }, { matchId: 4, text: "Gawang" },
+            { matchId: 5, text: "Maraton" }, { matchId: 5, text: "Lari Jauh" },
+            { matchId: 6, text: "Renang" }, { matchId: 6, text: "Gaya Dada" },
+            { matchId: 7, text: "Senam" }, { matchId: 7, text: "Kelenturan" },
+            { matchId: 8, text: "PSSI" }, { matchId: 8, text: "Sepak Bola Indo" },
+            { matchId: 9, text: "Bola Voli" }, { matchId: 9, text: "6 Pemain" },
+            { matchId: 10, text: "Tenis Meja" }, { matchId: 10, text: "Bet" },
+            { matchId: 11, text: "PBSI" }, { matchId: 11, text: "Bulutangkis Indo" },
+            { matchId: 12, text: "PERBASI" }, { matchId: 12, text: "Basket Indo" },
+            { matchId: 13, text: "Softball" }, { matchId: 13, text: "Stik Pemukul" },
+            { matchId: 14, text: "Senam Lantai" }, { matchId: 14, text: "Matras" },
+            { matchId: 15, text: "Atletik" }, { matchId: 15, text: "Ibu Olahraga" }
+          ],
+          scramble: ["OLAHRAGA", "KESEHATAN", "KEBUGARAN", "SENAM", "LARI", "SEPAKbola", "BASKET", "ATLETIK", "STRETCHING", "VOLI", "RENANG", "FISIK", "LATIHAN", "OTOT", "JANTUNG", "DEHIDRASI", "NUTRISI", "PROTEIN", "VITAMIN", "KARBOHIDRAT", "KALORI", "KRAM", "CEDERA", "REKREASI", "KONTRAKSI"],
+          kuis: [
+            { q: "Berapakah jumlah pemain dalam satu tim sepak bola?", o: ["9", "10", "11", "12"], a: "11" },
+            { q: "Gaya renang yang menyerupai gerakan katak berenang adalah...", o: ["Gaya Bebas", "Gaya Kupu-kupu", "Gaya Punggung", "Gaya Dada"], a: "Gaya Dada" },
+            { q: "Induk organisasi bulutangkis di Indonesia adalah...", o: ["PSSI", "PBSI", "PERBASI", "PTMSI"], a: "PBSI" },
+            { q: "Lari jarak jauh menempuh jarak sejauh...", o: ["100 m", "400 m", "1500 m", "42.195 km"], a: "42.195 km" },
+            { q: "Kartu merah dalam pertandingan sepak bola berarti pemain harus...", o: ["Keluar lapangan", "Peringatan keras", "Mendapat hadiah", "Ganti posisi"], a: "Keluar lapangan" },
+            { q: "Berapakah jumlah pemain dalam satu tim bola voli?", o: ["5 orang", "6 orang", "7 orang", "11 orang"], a: "6 orang" },
+            { q: "Alat pemukul dalam permainan tenis meja dinamakan...", o: ["Raket", "Bet", "Glove", "Stik"], a: "Bet" },
+            { q: "Induk organisasi sepak bola dunia adalah...", o: ["FIFA", "FIBA", "BWF", "PSSI"], a: "FIFA" },
+            { q: "Senam lantai biasanya dilakukan di atas alat bernama...", o: ["Matras", "Papan", "Pasir", "Tali"], a: "Matras" },
+            { q: "Start yang digunakan untuk pelari jarak pendek adalah...", o: ["Start Berdiri", "Start Melayang", "Start Jongkok", "Start Bebas"], a: "Start Jongkok" }
+          ]
+        },
+        umum: {
+          memori: [
+            { matchId: 1, text: "Bumi" }, { matchId: 1, text: "Planet Ketiga" },
+            { matchId: 2, text: "Matahari" }, { matchId: 2, text: "Bintang" },
+            { matchId: 3, text: "Komputer" }, { matchId: 3, text: "CPU" },
+            { matchId: 4, text: "Air" }, { matchId: 4, text: "H2O" },
+            { matchId: 5, text: "Api" }, { matchId: 5, text: "Panas" },
+            { matchId: 6, text: "Es" }, { matchId: 6, text: "Dingin" },
+            { matchId: 7, text: "Gitar" }, { matchId: 7, text: "Alat Musik" },
+            { matchId: 8, text: "Kamera" }, { matchId: 8, text: "Foto" },
+            { matchId: 9, text: "Asia" }, { matchId: 9, text: "Benua Terbesar" },
+            { matchId: 10, text: "Paus Biru" }, { matchId: 10, text: "Mamalia Terbesar" },
+            { matchId: 11, text: "Yen" }, { matchId: 11, text: "Negara Jepang" },
+            { matchId: 12, text: "Rupiah" }, { matchId: 12, text: "Indonesia" },
+            { matchId: 13, text: "Monas" }, { matchId: 13, text: "Kota Jakarta" },
+            { matchId: 14, text: "Borobudur" }, { matchId: 14, text: "Kota Magelang" },
+            { matchId: 15, text: "Internet" }, { matchId: 15, text: "Koneksi Global" }
+          ],
+          scramble: ["PENGETAHUAN", "TEKNOLOGI", "BELAJAR", "SEKOLAH", "PINTAR", "KREATIF", "ILMU", "DUNIA", "INTERNET", "KOMPUTER", "INFORMASI", "BUDAYA", "NEGARA", "PLANET", "BINTANG", "GEOGRAFI", "ATLAS", "POLITIK", "HUKUM", "AGAMA", "PANCASILA", "DEMOKRASI", "KOPERASI", "KOMUNIKASI", "PENGUSAHA"],
+          kuis: [
+            { q: "Planet ketiga terdekat dari Matahari adalah...", o: ["Merkurius", "Venus", "Bumi", "Mars"], a: "Bumi" },
+            { q: "Alat musik gitar dimainkan dengan cara...", o: ["Ditiup", "Dipukul", "Digesek", "Dipetik"], a: "Dipetik" },
+            { q: "Benua terbesar di dunia adalah...", o: ["Afrika", "Asia", "Eropa", "Amerika"], a: "Asia" },
+            { q: "Mamalia laut terbesar di dunia adalah...", o: ["Hiu", "Lumba-lumba", "Paus Biru", "Anjing Laut"], a: "Paus Biru" },
+            { q: "Mata uang resmi negara Jepang adalah...", o: ["Dollar", "Yen", "Euro", "Rupiah"], a: "Yen" },
+            { q: "Candi Borobudur yang terkenal terletak di provinsi...", o: ["Jawa Barat", "Jawa Tengah", "Jawa Timur", "Yogyakarta"], a: "Jawa Tengah" },
+            { q: "Benua terkecil di dunia adalah...", o: ["Eropa", "Australia", "Antartika", "Amerika Selatan"], a: "Australia" },
+            { q: "Penemu lampu pijar adalah...", o: ["Thomas Alva Edison", "Alexander Graham Bell", "Albert Einstein", "Nikola Tesla"], a: "Thomas Alva Edison" },
+            { q: "Gunung tertinggi di dunia adalah...", o: ["Gunung Kilimanjaro", "Gunung Everest", "Gunung Fuji", "Gunung Semeru"], a: "Gunung Everest" },
+            { q: "Dasar negara Indonesia dinamakan...", o: ["UUD 1945", "Pancasila", "Bhinneka Tunggal Ika", "Proklamasi"], a: "Pancasila" }
+          ]
+        }
+      };
+ 
+      const normSubject = subject.toLowerCase();
+      let matchedKey = "umum";
+      for (let key in data) {
+        if (normSubject.includes(key)) {
+          matchedKey = key;
+          break;
+        }
+      }
+      return data[matchedKey];
+    }
+ 
+    // --- HELPER UNTUK GAME DINAMIS (TIDAK AKAN PERNAH SAMA) ---
+    function getRandomPairsFromPool(pool, numPairs) {
+      const groups = {};
+      pool.forEach(item => {
+        if (!groups[item.matchId]) groups[item.matchId] = [];
+        groups[item.matchId].push(item);
+      });
+      
+      const matchIds = Object.keys(groups);
+      const selectedIds = matchIds.sort(() => Math.random() - 0.5).slice(0, numPairs);
+      
+      const selectedItems = [];
+      selectedIds.forEach(id => {
+        selectedItems.push(...groups[id]);
+      });
+      return selectedItems;
+    }
+ 
+    function generateDynamicMathPairs(numPairs) {
+      const pairs = [];
+      const usedAnswers = new Set();
+      let matchId = 1;
+      
+      while (pairs.length < numPairs * 2) {
+        const num1 = Math.floor(Math.random() * 12) + 2;
+        const num2 = Math.floor(Math.random() * 10) + 2;
+        const op = Math.random() > 0.5 ? "+" : "x";
+        let qText = "";
+        let ansVal = 0;
+        
+        if (op === "+") {
+          qText = `${num1} + ${num2}`;
+          ansVal = num1 + num2;
+        } else {
+          qText = `${num1} x ${num2}`;
+          ansVal = num1 * num2;
+        }
+        
+        const ansStr = ansVal.toString();
+        if (!usedAnswers.has(ansStr)) {
+          usedAnswers.add(ansStr);
+          pairs.push({ matchId: matchId, text: qText });
+          pairs.push({ matchId: matchId, text: ansStr });
+          matchId++;
+        }
+      }
+      return pairs;
+    }
+ 
+    function generateDynamicMathKuis(numQuestions) {
+      const pool = [];
+      for (let i = 0; i < numQuestions; i++) {
+        const type = Math.floor(Math.random() * 4); // 0: add/sub, 1: mul, 2: square, 3: root
+        let q = "";
+        let a = "";
+        let o = [];
+        
+        if (type === 0) {
+          const num1 = Math.floor(Math.random() * 80) + 10;
+          const num2 = Math.floor(Math.random() * 80) + 10;
+          const isAdd = Math.random() > 0.5;
+          if (isAdd) {
+            q = `Berapakah hasil dari ${num1} + ${num2}?`;
+            a = (num1 + num2).toString();
+          } else {
+            const max = Math.max(num1, num2);
+            const min = Math.min(num1, num2);
+            q = `Berapakah hasil dari ${max} - ${min}?`;
+            a = (max - min).toString();
+          }
+        } else if (type === 1) {
+          const num1 = Math.floor(Math.random() * 12) + 2;
+          const num2 = Math.floor(Math.random() * 12) + 2;
+          q = `Berapakah hasil perkalian dari ${num1} x ${num2}?`;
+          a = (num1 * num2).toString();
+        } else if (type === 2) {
+          const num = Math.floor(Math.random() * 12) + 2;
+          q = `Berapakah hasil dari ${num} kuadrat (pangkat 2)?`;
+          a = (num * num).toString();
+        } else {
+          const squares = [4, 9, 16, 25, 36, 49, 64, 81, 100, 121, 144];
+          const sqVal = squares[Math.floor(Math.random() * squares.length)];
+          const ans = Math.sqrt(sqVal);
+          q = `Berapakah akar pangkat dua dari ${sqVal}?`;
+          a = ans.toString();
+        }
+        
+        const ansNum = parseInt(a);
+        const wrongAnswers = [ansNum + 5, ansNum - 3, ansNum + 10].map(n => n.toString());
+        o = [a, ...wrongAnswers];
+        pool.push({ q, o, a });
+      }
+      return pool;
+    }
+ 
+    // STATE GAME MULTIPLE
+    let activeGameTab = "memori";
+    let firstCard = null;
+    let secondCard = null;
+    let lockBoard = false;
+    let moves = 0;
+    let matchesCount = 0;
+ 
+    function showEducationalGame() {
+      const gameContainer = document.getElementById("gameContainer");
+      if (gameContainer.style.display === "none") {
+        gameContainer.style.display = "block";
+        switchGameTab(activeGameTab);
+        gameContainer.scrollIntoView({ behavior: 'smooth' });
+      } else {
+        gameContainer.style.display = "none";
+      }
+    }
+ 
+    function switchGameTab(gameKey) {
+      activeGameTab = gameKey;
+      document.getElementById("btnTabGameMemori").classList.remove("active");
+      document.getElementById("btnTabGameScramble").classList.remove("active");
+      document.getElementById("btnTabGameKuis").classList.remove("active");
+      document.getElementById("btnTabGameCariKata").classList.remove("active");
+      document.getElementById("btnTabGameHujanKata").classList.remove("active");
+      
+      document.getElementById("gameContentMemori").style.display = "none";
+      document.getElementById("gameContentScramble").style.display = "none";
+      document.getElementById("gameContentKuis").style.display = "none";
+      document.getElementById("gameContentCariKata").style.display = "none";
+      document.getElementById("gameContentHujanKata").style.display = "none";
+ 
+      // Hentikan interval Word Search jika ada
+      if (wordsearchTimerInterval) clearInterval(wordsearchTimerInterval);
+      
+      // Hentikan loop Hujan Kata jika aktif
+      if (wordfallGameRunning) {
+        endWordfallGame(false);
+      }
+ 
+      if (gameKey === 'memori') {
+        document.getElementById("btnTabGameMemori").classList.add("active");
+        document.getElementById("gameContentMemori").style.display = "block";
+        initMemoryGame();
+      } else if (gameKey === 'scramble') {
+        document.getElementById("btnTabGameScramble").classList.add("active");
+        document.getElementById("gameContentScramble").style.display = "block";
+        initScrambleGame();
+      } else if (gameKey === 'kuis') {
+        document.getElementById("btnTabGameKuis").classList.add("active");
+        document.getElementById("gameContentKuis").style.display = "block";
+        initKuisGame();
+      } else if (gameKey === 'carikata') {
+        document.getElementById("btnTabGameCariKata").classList.add("active");
+        document.getElementById("gameContentCariKata").style.display = "block";
+        initCariKataGame();
+      } else if (gameKey === 'hujankata') {
+        document.getElementById("btnTabGameHujanKata").classList.add("active");
+        document.getElementById("gameContentHujanKata").style.display = "block";
+        // Reset tampilan overlay
+        const overlay = document.getElementById("wordfallStartOverlay");
+        overlay.innerHTML = `
+          <span style="font-size: 32px;">🎯</span>
+          <span style="font-size: 12px; text-align:center; padding:0 20px; color:#cbd5e1;">Ketik kata/jawaban matematika dari bubble yang jatuh secepat mungkin!</span>
+          <button class="btn-submit" onclick="startWordFallGame()" style="width:auto; padding:8px 24px; font-size:13px; margin-top:8px;">Mulai Bermain</button>
+        `;
+        overlay.style.display = "flex";
+      }
+    }
+ 
+    // GAME 1: MEMORI CARD MATCH
+    function initMemoryGame() {
+      firstCard = null;
+      secondCard = null;
+      lockBoard = false;
+      moves = 0;
+      matchesCount = 0;
+      document.getElementById("gameMoves").innerText = moves;
+      document.getElementById("gameMatches").innerText = "0 / 8";
+ 
+      const isMath = (examSubject || "").toLowerCase().includes("matematika");
+      let selectedItems = [];
+ 
+      if (isMath) {
+        selectedItems = generateDynamicMathPairs(8);
+      } else {
+        const gameData = getSubjectGameData();
+        const rawPool = JSON.parse(JSON.stringify(gameData.memori));
+        selectedItems = getRandomPairsFromPool(rawPool, 8);
+      }
+ 
+      const shuffledCards = selectedItems.sort(() => Math.random() - 0.5);
+      const board = document.getElementById("gameBoard");
+      board.innerHTML = "";
+      
+      shuffledCards.forEach((c, idx) => {
+        const cardEl = document.createElement("div");
+        cardEl.className = "game-card";
+        cardEl.dataset.matchId = c.matchId;
+        cardEl.dataset.index = idx;
+        cardEl.innerText = "❓";
+        cardEl.onclick = () => flipCard(cardEl, c.text);
+        board.appendChild(cardEl);
+      });
+    }
+ 
+    function flipCard(cardEl, cardText) {
+      if (lockBoard) return;
+      if (cardEl === firstCard) return;
+ 
+      cardEl.classList.add("flipped");
+      cardEl.innerText = cardText;
+ 
+      if (!firstCard) {
+        firstCard = cardEl;
+        return;
+      }
+ 
+      secondCard = cardEl;
+      moves++;
+      document.getElementById("gameMoves").innerText = moves;
+      
+      checkForMatch();
+    }
+ 
+    function checkForMatch() {
+      const isMatch = firstCard.dataset.matchId === secondCard.dataset.matchId;
+      if (isMatch) {
+        disableCards();
+      } else {
+        unflipCards();
+      }
+    }
+ 
+    function disableCards() {
+      firstCard.classList.add("matched");
+      secondCard.classList.add("matched");
+      matchesCount++;
+      document.getElementById("gameMatches").innerText = `${matchesCount} / 8`;
+      
+      if (matchesCount === 8) {
+        setTimeout(() => {
+          alert(`🎉 Luar biasa! Anda menyelesaikan Game Memori dalam ${moves} langkah!`);
+        }, 500);
+      }
+      
+      resetBoard();
+    }
+ 
+    function unflipCards() {
+      lockBoard = true;
+      setTimeout(() => {
+        firstCard.classList.remove("flipped");
+        secondCard.classList.remove("flipped");
+        firstCard.innerText = "❓";
+        secondCard.innerText = "❓";
+        resetBoard();
+      }, 1000);
+    }
+ 
+    function resetBoard() {
+      firstCard = null;
+      secondCard = null;
+      lockBoard = false;
+    }
+ 
+    // GAME 2: WORD SCRAMBLE
+    let scrambleWords = [];
+    let scrambleIndex = 0;
+    let scrambleCurrentWord = "";
+    let scrambleScoreValue = 0;
+ 
+    function initScrambleGame() {
+      scrambleScoreValue = 0;
+      scrambleIndex = 0;
+      document.getElementById("scrambleScore").innerText = scrambleScoreValue;
+      document.getElementById("scrambleRound").innerText = "1 / 5";
+      document.getElementById("scrambleFeedback").innerText = "";
+      document.getElementById("scrambleInput").value = "";
+ 
+      const gameData = getSubjectGameData();
+      const wordsPool = gameData.scramble || ["DUNIA", "PINTAR", "SEKOLAH"];
+      scrambleWords = wordsPool.slice().sort(() => Math.random() - 0.5).slice(0, 5);
+      
+      loadNextScrambleWord();
+    }
+ 
+    function loadNextScrambleWord() {
+      if (scrambleIndex >= 5) {
+        document.getElementById("scrambleFeedback").innerText = `🎉 Game Selesai! Skor Akhir: ${scrambleScoreValue}`;
+        document.getElementById("scrambleFeedback").style.color = "var(--color-success)";
+        document.getElementById("scrambleWordDisplay").innerText = "🏆 SELESAI";
+        return;
+      }
+ 
+      scrambleCurrentWord = scrambleWords[scrambleIndex].toUpperCase();
+      document.getElementById("scrambleRound").innerText = `${scrambleIndex + 1} / 5`;
+      document.getElementById("scrambleInput").value = "";
+      document.getElementById("scrambleFeedback").innerText = "";
+ 
+      let scrambled = scrambleCurrentWord.split('').sort(() => Math.random() - 0.5).join(' ');
+      if (scrambled.replace(/\s+/g, '') === scrambleCurrentWord && scrambleCurrentWord.length > 2) {
+        scrambled = scrambleCurrentWord.split('').sort(() => Math.random() - 0.5).join(' ');
+      }
+ 
+      document.getElementById("scrambleWordDisplay").innerText = scrambled;
+    }
+ 
+    function checkScrambleGuess() {
+      const guess = document.getElementById("scrambleInput").value.trim().toUpperCase();
+      if (!guess) return;
+ 
+      const feedback = document.getElementById("scrambleFeedback");
+      if (guess === scrambleCurrentWord) {
+        scrambleScoreValue += 20;
+        document.getElementById("scrambleScore").innerText = scrambleScoreValue;
+        feedback.innerText = "✓ Benar! +20 Poin";
+        feedback.style.color = "var(--color-success)";
+        
+        scrambleIndex++;
+        setTimeout(loadNextScrambleWord, 1200);
+      } else {
+        feedback.innerText = "❌ Salah! Coba tebak lagi.";
+        feedback.style.color = "var(--color-danger)";
+        if (navigator.vibrate) navigator.vibrate(100);
+      }
+    }
+ 
+    function skipScrambleWord() {
+      scrambleIndex++;
+      loadNextScrambleWord();
+    }
+ 
+    // GAME 3: KUIS KILAT SPEED TRIVIA
+    let kuisQuestions = [];
+    let kuisIndex = 0;
+    let kuisScoreValue = 0;
+ 
+    function initKuisGame() {
+      kuisScoreValue = 0;
+      kuisIndex = 0;
+      document.getElementById("kuisScore").innerText = kuisScoreValue;
+      document.getElementById("kuisRound").innerText = "1 / 5";
+      document.getElementById("kuisFeedback").innerText = "";
+ 
+      const isMath = (examSubject || "").toLowerCase().includes("matematika");
+      let kuisPool = [];
+      
+      if (isMath) {
+        kuisPool = generateDynamicMathKuis(5);
+      } else {
+        const gameData = getSubjectGameData();
+        kuisPool = JSON.parse(JSON.stringify(gameData.kuis || []));
+      }
+ 
+      kuisQuestions = kuisPool.sort(() => Math.random() - 0.5).slice(0, 5);
+      kuisQuestions.forEach(q => {
+        q.o = q.o.sort(() => Math.random() - 0.5);
+      });
+      
+      loadNextKuisQuestion();
+    }
+ 
+    function loadNextKuisQuestion() {
+      if (kuisIndex >= 5) {
+        document.getElementById("kuisFeedback").innerText = `🎉 Selesai! Anda berhasil menjawab ${kuisScoreValue} dari 5 soal kuis.`;
+        document.getElementById("kuisFeedback").style.color = "var(--color-success)";
+        document.getElementById("kuisOptionsContainer").innerHTML = "";
+        document.getElementById("kuisQuestionText").innerText = "🏆 Sesi Kuis Selesai!";
+        return;
+      }
+ 
+      const q = kuisQuestions[kuisIndex];
+      document.getElementById("kuisRound").innerText = `${kuisIndex + 1} / 5`;
+      document.getElementById("kuisQuestionText").innerText = q.q;
+      document.getElementById("kuisFeedback").innerText = "";
+ 
+      const container = document.getElementById("kuisOptionsContainer");
+      container.innerHTML = "";
+ 
+      q.o.forEach(opt => {
+        const btn = document.createElement("button");
+        btn.className = "option-btn";
+        btn.style.marginBottom = "8px";
+        btn.innerText = opt;
+        btn.onclick = () => checkKuisAnswer(btn, opt, q.a);
+        container.appendChild(btn);
+      });
+    }
+ 
+    function checkKuisAnswer(btnEl, selectedOption, correctAns) {
+      const buttons = document.querySelectorAll("#kuisOptionsContainer .option-btn");
+      buttons.forEach(btn => btn.disabled = true);
+ 
+      const feedback = document.getElementById("kuisFeedback");
+      if (selectedOption === correctAns) {
+        btnEl.style.backgroundColor = "rgba(16, 185, 129, 0.25)";
+        btnEl.style.borderColor = "var(--color-success)";
+        kuisScoreValue++;
+        document.getElementById("kuisScore").innerText = kuisScoreValue;
+        feedback.innerText = "✓ Jawaban Benar!";
+        feedback.style.color = "var(--color-success)";
+      } else {
+        btnEl.style.backgroundColor = "rgba(239, 68, 68, 0.25)";
+        btnEl.style.borderColor = "var(--color-danger)";
+        feedback.innerText = `❌ Salah! Jawaban benar: ${correctAns}`;
+        feedback.style.color = "var(--color-danger)";
+        if (navigator.vibrate) navigator.vibrate(100);
+      }
+ 
+      kuisIndex++;
+      setTimeout(loadNextKuisQuestion, 1500);
+    }
+ 
+    // --- GAME 4: CARI KATA (WORD SEARCH) LOGIC ---
+    let selectedCells = [];
+    let wordsearchGridData = [];
+    let wordsearchTargetWords = [];
+    let foundWordsearchWords = [];
+    let wordsearchTime = 0;
+    let wordsearchTimerInterval = null;
+ 
+    function initCariKataGame() {
+      selectedCells = [];
+      foundWordsearchWords = [];
+      document.getElementById("carikataFound").innerText = "0 / 4";
+      wordsearchTime = 0;
+      document.getElementById("carikataTimer").innerText = "0s";
+      
+      if (wordsearchTimerInterval) clearInterval(wordsearchTimerInterval);
+      wordsearchTimerInterval = setInterval(() => {
+        wordsearchTime++;
+        document.getElementById("carikataTimer").innerText = `${wordsearchTime}s`;
+      }, 1000);
+ 
+      const gameData = getSubjectGameData();
+      const wordsPool = (gameData.scramble || ["DUNIA", "PINTAR", "SEKOLAH", "ILMU"]).filter(w => w.length >= 3 && w.length <= 8);
+      wordsearchTargetWords = wordsPool.sort(() => Math.random() - 0.5).slice(0, 4).map(w => w.toUpperCase());
+ 
+      wordsearchGridData = Array(100).fill("");
+ 
+      wordsearchTargetWords.forEach(word => {
+        let placed = false;
+        let attempts = 0;
+        while (!placed && attempts < 100) {
+          attempts++;
+          const direction = Math.floor(Math.random() * 3); // 0: Horisontal, 1: Vertikal, 2: Diagonal
+          const startRow = Math.floor(Math.random() * 10);
+          const startCol = Math.floor(Math.random() * 10);
+ 
+          let fit = true;
+          let cells = [];
+ 
+          for (let i = 0; i < word.length; i++) {
+            let r = startRow;
+            let c = startCol;
+            if (direction === 0) c += i;
+            else if (direction === 1) r += i;
+            else if (direction === 2) { r += i; c += i; }
+ 
+            if (r >= 10 || c >= 10) {
+              fit = false;
+              break;
+            }
+ 
+            const idx = r * 10 + c;
+            if (wordsearchGridData[idx] !== "" && wordsearchGridData[idx] !== word[i]) {
+              fit = false;
+              break;
+            }
+            cells.push({ idx, char: word[i] });
+          }
+ 
+          if (fit) {
+            cells.forEach(cell => {
+              wordsearchGridData[cell.idx] = cell.char;
+            });
+            placed = true;
+          }
+        }
+      });
+ 
+      const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+      for (let i = 0; i < 100; i++) {
+        if (wordsearchGridData[i] === "") {
+          wordsearchGridData[i] = alphabet[Math.floor(Math.random() * alphabet.length)];
+        }
+      }
+ 
+      const gridContainer = document.getElementById("wordsearchGrid");
+      gridContainer.innerHTML = "";
+      for (let i = 0; i < 100; i++) {
+        const cell = document.createElement("div");
+        cell.className = "wordsearch-cell";
+        cell.dataset.index = i;
+        cell.innerText = wordsearchGridData[i];
+        cell.onclick = () => toggleWordsearchCell(i);
+        gridContainer.appendChild(cell);
+      }
+ 
+      const listContainer = document.getElementById("wordsearchWordsList");
+      listContainer.innerHTML = "";
+      wordsearchTargetWords.forEach(word => {
+        const wordEl = document.createElement("span");
+        wordEl.className = "wordsearch-word";
+        wordEl.id = `wsWord-${word}`;
+        wordEl.innerText = word;
+        listContainer.appendChild(wordEl);
+      });
+    }
+ 
+    function toggleWordsearchCell(idx) {
+      const cellEl = document.querySelector(`.wordsearch-cell[data-index="${idx}"]`);
+      if (cellEl.classList.contains("found")) return;
+ 
+      const selIdx = selectedCells.indexOf(idx);
+      if (selIdx >= 0) {
+        selectedCells.splice(selIdx, 1);
+        cellEl.classList.remove("selected");
+      } else {
+        selectedCells.push(idx);
+        cellEl.classList.add("selected");
+      }
+ 
+      const currentStr = selectedCells.map(i => wordsearchGridData[i]).join("");
+      const revStr = [...currentStr].reverse().join("");
+ 
+      let matchedWord = wordsearchTargetWords.find(w => (w === currentStr || w === revStr) && !foundWordsearchWords.includes(w));
+      if (matchedWord) {
+        selectedCells.forEach(i => {
+          const el = document.querySelector(`.wordsearch-cell[data-index="${i}"]`);
+          el.classList.remove("selected");
+          el.classList.add("found");
+        });
+        foundWordsearchWords.push(matchedWord);
+        document.getElementById(`wsWord-${matchedWord}`).classList.add("found");
+        document.getElementById("carikataFound").innerText = `${foundWordsearchWords.length} / ${wordsearchTargetWords.length}`;
+        
+        selectedCells = [];
+        
+        if (foundWordsearchWords.length === wordsearchTargetWords.length) {
+          clearInterval(wordsearchTimerInterval);
+          setTimeout(() => {
+            alert(`🎉 Selamat! Anda menemukan semua kata dalam waktu ${wordsearchTime} detik!`);
+          }, 500);
+        }
+      } else if (selectedCells.length >= 10) {
+        clearWordsearchSelection();
+      }
+    }
+ 
+    function clearWordsearchSelection() {
+      selectedCells.forEach(i => {
+        const el = document.querySelector(`.wordsearch-cell[data-index="${i}"]`);
+        if (el) el.classList.remove("selected");
+      });
+      selectedCells = [];
+    }
+ 
+    // --- GAME 5: HUJAN KATA (WORD FALL) LOGIC ---
+    let wordfallScore = 0;
+    let wordfallLives = 3;
+    let wordfallActiveWords = [];
+    let wordfallGameRunning = false;
+    let wordfallSpawnTimer = null;
+    let wordfallMoveTimer = null;
+    let wordfallNextId = 0;
+ 
+    function startWordFallGame() {
+      document.getElementById("wordfallStartOverlay").style.display = "none";
+      document.getElementById("wordfallInput").disabled = false;
+      document.getElementById("btnWordfallSubmit").disabled = false;
+      document.getElementById("wordfallInput").value = "";
+      document.getElementById("wordfallInput").focus();
+      
+      wordfallScore = 0;
+      wordfallLives = 3;
+      wordfallActiveWords = [];
+      wordfallGameRunning = true;
+      wordfallNextId = 0;
+      
+      document.getElementById("wordfallScore").innerText = wordfallScore;
+      updateWordfallLivesDisplay();
+      
+      const container = document.getElementById("wordfallContainer");
+      Array.from(container.children).forEach(child => {
+        if (child.id !== "wordfallStartOverlay") {
+          container.removeChild(child);
+        }
+      });
+ 
+      // Daftarkan listener keyboard sekali saja jika belum
+      const inputEl = document.getElementById("wordfallInput");
+      if (inputEl && !inputEl.dataset.listenerBound) {
+        inputEl.dataset.listenerBound = "true";
+        inputEl.addEventListener("input", checkWordfallInput);
+        inputEl.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") {
+            checkWordfallInput();
+          }
+        });
+      }
+ 
+      if (wordfallSpawnTimer) clearInterval(wordfallSpawnTimer);
+      if (wordfallMoveTimer) clearInterval(wordfallMoveTimer);
+ 
+      wordfallSpawnTimer = setInterval(spawnWordfallItem, 2000);
+      wordfallMoveTimer = setInterval(moveWordfallItems, 50);
+    }
+ 
+    function updateWordfallLivesDisplay() {
+      let hearts = "";
+      for (let i = 0; i < 3; i++) {
+        hearts += i < wordfallLives ? "❤️ " : "🖤 ";
+      }
+      document.getElementById("wordfallLives").innerText = hearts.trim();
+    }
+ 
+    function spawnWordfallItem() {
+      if (!wordfallGameRunning) return;
+      
+      const gameData = getSubjectGameData();
+      let text = "";
+      let ans = "";
+      
+      const isMath = (examSubject || "").toLowerCase().includes("matematika");
+      
+      if (isMath) {
+        const num1 = Math.floor(Math.random() * 12) + 2;
+        const num2 = Math.floor(Math.random() * 10) + 2;
+        const ops = ["+", "-", "x"];
+        const op = ops[Math.floor(Math.random() * ops.length)];
+        if (op === "+") {
+          text = `${num1} + ${num2}`;
+          ans = (num1 + num2).toString();
+        } else if (op === "-") {
+          const max = Math.max(num1, num2);
+          const min = Math.min(num1, num2);
+          text = `${max} - ${min}`;
+          ans = (max - min).toString();
+        } else {
+          text = `${num1} x ${num2}`;
+          ans = (num1 * num2).toString();
+        }
+      } else {
+        const wordsPool = gameData.scramble || ["DUNIA", "BELAJAR", "PINTAR"];
+        text = wordsPool[Math.floor(Math.random() * wordsPool.length)].toUpperCase();
+        ans = text;
+      }
+      
+      const xPercent = Math.floor(Math.random() * 70) + 15;
+      const speed = Math.random() * 1.5 + 0.8;
+      
+      const container = document.getElementById("wordfallContainer");
+      const bubble = document.createElement("div");
+      bubble.className = "wordfall-bubble";
+      bubble.id = `wfBubble-${wordfallNextId}`;
+      bubble.style.left = `${xPercent}%`;
+      bubble.style.top = `-30px`;
+      bubble.innerText = text;
+      
+      container.appendChild(bubble);
+      
+      wordfallActiveWords.push({
+        id: wordfallNextId,
+        text: text,
+        ans: ans.trim().toLowerCase(),
+        y: -30,
+        speed: speed,
+        el: bubble
+      });
+      
+      wordfallNextId++;
+    }
+ 
+    function moveWordfallItems() {
+      if (!wordfallGameRunning) return;
+      
+      const containerHeight = 250;
+      const itemsToRemove = [];
+      
+      wordfallActiveWords.forEach(word => {
+        word.y += word.speed;
+        word.el.style.top = `${word.y}px`;
+        
+        if (word.y >= containerHeight - 35) {
+          itemsToRemove.push(word.id);
+          wordfallLives--;
+          updateWordfallLivesDisplay();
+          
+          const container = document.getElementById("wordfallContainer");
+          container.style.borderColor = "var(--color-danger)";
+          setTimeout(() => { container.style.borderColor = "var(--card-border)"; }, 200);
+          
+          if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+          
+          if (wordfallLives <= 0) {
+            endWordfallGame(false);
+          }
+        }
+      });
+      
+      wordfallActiveWords = wordfallActiveWords.filter(word => {
+        if (itemsToRemove.includes(word.id)) {
+          if (word.el && word.el.parentNode) {
+            word.el.parentNode.removeChild(word.el);
+          }
+          return false;
+        }
+        return true;
+      });
+    }
+ 
+    function checkWordfallInput() {
+      if (!wordfallGameRunning) return;
+      
+      const inputVal = document.getElementById("wordfallInput").value.trim().toLowerCase();
+      if (!inputVal) return;
+      
+      const matchIndex = wordfallActiveWords.findIndex(w => w.ans === inputVal);
+      
+      if (matchIndex >= 0) {
+        const matched = wordfallActiveWords[matchIndex];
+        
+        matched.el.style.transform = "translateX(-50%) scale(1.3)";
+        matched.el.style.background = "rgba(16, 185, 129, 0.6)";
+        matched.el.style.borderColor = "var(--color-success)";
+        
+        setTimeout(() => {
+          if (matched.el && matched.el.parentNode) {
+            matched.el.parentNode.removeChild(matched.el);
+          }
+        }, 150);
+        
+        wordfallActiveWords.splice(matchIndex, 1);
+        wordfallScore += 10;
+        document.getElementById("wordfallScore").innerText = wordfallScore;
+        document.getElementById("wordfallInput").value = "";
+        
+        if (navigator.vibrate) navigator.vibrate(50);
+      }
+    }
+ 
+    function checkWordfallInputDirect() {
+      checkWordfallInput();
+    }
+ 
+    function endWordfallGame(completed) {
+      wordfallGameRunning = false;
+      clearInterval(wordfallSpawnTimer);
+      clearInterval(wordfallMoveTimer);
+      
+      document.getElementById("wordfallInput").disabled = true;
+      document.getElementById("btnWordfallSubmit").disabled = true;
+      
+      const overlay = document.getElementById("wordfallStartOverlay");
+      overlay.innerHTML = `
+        <span style="font-size: 36px;">🏆</span>
+        <h4 style="margin: 0; color: var(--color-warning);">GAME OVER!</h4>
+        <p style="font-size: 13px; margin: 4px 0;">Skor Anda: <b>${wordfallScore}</b></p>
+        <button class="btn-submit" onclick="startWordFallGame()" style="width:auto; padding:8px 24px; font-size:13px; margin-top:8px;">Main Lagi</button>
+      `;
+      overlay.style.display = "flex";
+    }
+ 
+    function hashPin(pin) {
+      if (!pin) return "";
+      const salted = pin + "SECRET_UNLOCK_SALT_2026";
+      let hash = 0;
+      for (let i = 0; i < salted.length; i++) {
+        hash = ((hash << 5) - hash) + salted.charCodeAt(i);
+        hash = hash & hash;
+      }
+      return Math.abs(hash).toString(16);
+    }
   </script>
+
+  <!-- Modal Lockscreen Anti-Cheat -->
+  <div id="lockscreenOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #080c1e; z-index: 99999; align-items: center; justify-content: center; padding: 24px;">
+    <div class="glass-card" style="text-align: center; max-width: 450px; border: 2px solid var(--color-danger); box-shadow: 0 0 40px rgba(239, 68, 68, 0.25);">
+      <div style="font-size: 64px; margin-bottom: 16px; animation: pulse 1.5s infinite; display: inline-block;">🔒</div>
+      <h2 style="color: var(--color-danger); font-family: var(--font-title); font-weight: 700; margin: 0 0 10px 0; font-size: 20px;">LAYAR UJIAN TERKUNCI!</h2>
+      <p style="font-size: 13px; color: #E2E8F0; line-height: 1.6; margin-bottom: 24px;">
+        Ujian Anda telah dikunci karena Anda terdeteksi keluar dari aplikasi/pindah tab melewati batas toleransi (<span id="txtMaxCheatLimit">0</span> kali).<br>
+        Silakan hubungi Guru / Pengawas untuk membuka kembali ujian Anda.
+      </p>
+      
+      <div class="form-group" style="text-align: left;">
+        <label style="color: var(--color-danger); font-weight: bold; font-size: 11px;">PIN Pengawas / Guru</label>
+        <input type="password" class="form-control" id="unlockPinField" placeholder="Masukkan PIN Pengawas" pattern="[0-9]*" inputmode="numeric" maxlength="8" style="text-align: center; font-size: 20px; letter-spacing: 0.5em;">
+      </div>
+      
+      <button class="btn-submit" onclick="verifyUnlockPin()" style="background-color: var(--color-danger); color: #FFF; font-weight: 700; margin-top: 10px; border: none; cursor: pointer;">Buka Kunci Layar</button>
+    </div>
+  </div>
+
+  <!-- Fullscreen Required Overlay -->
+  <div id="fullscreenRequiredOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(8, 12, 30, 0.98); z-index: 9999; align-items: center; justify-content: center; padding: 24px; backdrop-filter: blur(8px);">
+    <div class="glass-card" style="text-align: center; max-width: 420px; border: 1px solid var(--color-primary); box-shadow: 0 10px 30px rgba(56, 189, 248, 0.25);">
+      <div style="font-size: 56px; margin-bottom: 16px;">🖥️</div>
+      <h2 style="color: #FFF; font-family: var(--font-title); font-weight: 700; margin: 0 0 10px 0; font-size: 20px;">Layar Penuh Wajib</h2>
+      <p style="font-size: 13px; color: #cbd5e1; line-height: 1.6; margin-bottom: 24px;">
+        Ujian ini wajib dikerjakan dalam mode Layar Penuh (Fullscreen) untuk menghindari kecurangan.
+      </p>
+      <button class="btn-submit" onclick="activateFullscreenAndStart()" style="background-color: var(--color-primary); color: #080C1E; font-weight: 700; border: none; cursor: pointer;">Masuk Layar Penuh</button>
+    </div>
+  </div>
 </body>
 </html>

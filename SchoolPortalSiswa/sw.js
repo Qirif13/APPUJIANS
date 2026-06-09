@@ -1,4 +1,4 @@
-const CACHE_NAME = 'portal-siswa-cache-v2';
+const CACHE_NAME = 'portal-siswa-cache-v9';
 const ASSETS = [
   './',
   './index.html',

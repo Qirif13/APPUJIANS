@@ -1,6 +1,6 @@
 {
-  "name": "Portal Siswa Hub",
-  "short_name": "PortalSiswa",
+  "name": "dashboard siswa",
+  "short_name": "dashboard siswa",
   "description": "Pusat Media Belajar, Website, & Portal Ujian Sekolah untuk Siswa",
   "start_url": "./index.html",
   "display": "standalone",
