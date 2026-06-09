@@ -1,6 +1,6 @@
 {
-  "name": "Panel Dashboard Guru",
-  "short_name": "DashboardGuru",
+  "name": "dashboard guru",
+  "short_name": "dashboard guru",
   "description": "Panel Pengawas Ujian Offline, Generator Kode Soal, dan Statistik Nilai",
   "start_url": "./index.html",
   "display": "standalone",

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'portal-guru-cache-v2';
+const CACHE_NAME = 'portal-guru-cache-v10';
 const ASSETS = [
   './',
   './index.html',

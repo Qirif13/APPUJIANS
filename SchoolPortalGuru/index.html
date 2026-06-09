@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Panel Dashboard Guru</title>
+  <title>dashboard guru</title>
   
   <!-- Manifest & PWA Meta Tags -->
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#061F14">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="DashboardGuru">
+  <meta name="apple-mobile-web-app-title" content="dashboard guru">
   <link rel="apple-touch-icon" href="icon-192.png">
 
   <!-- Google Fonts -->
@@ -46,6 +46,8 @@
       padding: 0;
       font-family: var(--font-body);
       background-color: var(--bg-color);
+      background-image: radial-gradient(circle at top, #041859 0%, var(--bg-color) 100%);
+      background-attachment: fixed;
       color: var(--color-text);
       overflow-x: hidden;
       min-height: 100vh;
@@ -79,7 +81,7 @@
 
     /* Portal Home Header */
     .header { text-align: center; margin-bottom: 30px; margin-top: 30px; }
-    .logo { width: 90px; height: 90px; border-radius: 24px; box-shadow: 0 10px 30px rgba(16, 185, 129, 0.25); border: 2px solid rgba(255, 255, 255, 0.1); margin-bottom: 15px; }
+    .logo { width: 90px; height: 90px; margin-bottom: 15px; filter: drop-shadow(0 10px 20px rgba(16, 185, 129, 0.2)); }
     h1 { font-family: var(--font-title); font-weight: 700; font-size: 26px; margin: 0 0 6px 0; letter-spacing: 0.05em; background: linear-gradient(135deg, #FFF 30%, var(--color-primary) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     .subtitle { font-size: 13px; color: var(--color-muted); margin: 0; }
 
@@ -140,6 +142,88 @@
     @media (max-width: 600px) {
       .filter-row { grid-template-columns: 1fr; }
     }
+
+    /* Account Switcher Styling (Facebook-style) */
+    .account-card {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.2s ease;
+    }
+    .account-card:hover {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: rgba(16, 185, 129, 0.3);
+    }
+    .account-card.active {
+      background: rgba(16, 185, 129, 0.08);
+      border-color: var(--color-primary);
+      box-shadow: 0 0 15px rgba(16, 185, 129, 0.2);
+    }
+    .account-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--color-primary), #059669);
+      color: #04080F;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 16px;
+      margin-bottom: 8px;
+      font-family: var(--font-title);
+    }
+    .account-avatar.admin {
+      background: linear-gradient(135deg, var(--color-warning), #d97706);
+    }
+    .account-avatar.add-new {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--color-primary);
+      border: 2px dashed rgba(16, 185, 129, 0.3);
+    }
+    .account-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: #FFF;
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      width: 100%;
+    }
+    .account-card-delete {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: rgba(239, 68, 68, 0.1);
+      color: #EF4444;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
+      opacity: 0.6;
+      transition: all 0.2s;
+      line-height: 1;
+      padding: 0;
+    }
+    .account-card-delete:hover {
+      opacity: 1;
+      background: #EF4444;
+      color: #FFF;
+    }
   </style>
 </head>
 <body>
@@ -153,16 +237,40 @@
   <!-- ========================================== -->
   <div class="screen active" id="screenLoginPin" style="justify-content: center; align-items: center;">
     <div class="glass-card" style="max-width: 400px; text-align: center;">
-      <img src="icon-512.png" alt="Logo Guru" class="logo" style="box-shadow: 0 10px 30px rgba(16, 185, 129, 0.25);">
-      <h1 id="txtSchoolTitleMain">PORTAL GURU</h1>
-      <p class="subtitle" style="margin-bottom: 24px;">Masukkan PIN Pengawas untuk mengelola ujian:</p>
+      <img src="icon-512.png" alt="Logo Guru" class="logo">
+      <h1 id="txtSchoolTitleMain">dashboard guru</h1>
+      <p class="subtitle" style="margin-bottom: 20px;">Pilih Akun Guru dan masukkan PIN:</p>
       
+      <!-- Access Mode Switcher Grid -->
       <div class="form-group" style="text-align: left;">
-        <label>PIN Pengawas</label>
-        <input type="password" class="form-control" id="loginPinField" placeholder="Masukkan PIN Pengawas" pattern="[0-9]*" inputmode="numeric" maxlength="8" style="text-align: center; font-size: 20px; letter-spacing: 0.5em;" onkeydown="handlePinKeyPress(event)">
+        <label style="display: block; font-size: 11px; font-weight: 600; color: var(--color-muted); text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.05em;">Pilih Tipe Akses</label>
+        <div id="accountCardsContainer" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px;">
+          <!-- Card 1: Admin Master -->
+          <div class="account-card active" id="cardLoginAdmin" onclick="selectLoginMode('admin')">
+            <div class="account-avatar admin">🔑</div>
+            <div class="account-name">Admin Master</div>
+          </div>
+          <!-- Card 2: Guru / Pengawas -->
+          <div class="account-card" id="cardLoginTeacher" onclick="selectLoginMode('teacher')">
+            <div class="account-avatar">👨‍🏫</div>
+            <div class="account-name">Guru / Pengawas</div>
+          </div>
+        </div>
+        <input type="hidden" id="loginTeacherSelect" value="admin">
+      </div>
+
+      <!-- Input Nama Guru (Hidden by default, shown for Teacher mode) -->
+      <div class="form-group" id="groupLoginTeacherName" style="display: none; text-align: left;">
+        <label>Nama Lengkap Guru</label>
+        <input type="text" class="form-control" id="loginTeacherNameField" placeholder="Masukkan Nama Lengkap Anda">
+      </div>
+
+      <div class="form-group" style="text-align: left;">
+        <label id="lblLoginPin">PIN Pengawas (Master)</label>
+        <input type="password" class="form-control" id="loginPinField" placeholder="Masukkan PIN" pattern="[0-9]*" inputmode="numeric" maxlength="8" style="text-align: center; font-size: 20px; letter-spacing: 0.5em;" onkeydown="handlePinKeyPress(event)">
       </div>
       
-      <button class="btn-submit" onclick="verifyLoginPinSubmit()">Masuk Dashboard</button>
+      <button class="btn-submit" id="btnSubmitLogin" onclick="verifyLoginPinSubmit()">Masuk Dashboard</button>
     </div>
   </div>
 
@@ -174,13 +282,17 @@
     
     <div class="glass-card">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--card-border); padding-bottom: 14px;">
-        <h2 style="margin:0;">📊 Panel Dashboard Guru</h2>
+        <div>
+          <h2 style="margin:0;" id="txtDashboardHeader">📊 dashboard guru</h2>
+          <div id="txtTeacherProfileIndicator" style="font-size: 11px; color: var(--color-primary); font-weight: 600; margin-top: 4px; text-align: left;">Profil: Admin</div>
+        </div>
         <button class="btn-action btn-action-secondary" onclick="exitToLogin()" style="max-width: 100px; padding: 8px 16px;">Keluar</button>
       </div>
 
       <div class="tab-menu">
         <button class="tab-btn active" id="tabBtnStat" onclick="switchTeacherTab('stat')">📈 Statistik Nilai</button>
         <button class="tab-btn" id="tabBtnImport" onclick="switchTeacherTab('import')">📝 Buat Ujian Baru</button>
+        <button class="tab-btn" id="tabBtnExamsList" onclick="switchTeacherTab('exams')">📁 Daftar Ujian</button>
       </div>
 
       <!-- TAB 1: STATISTICS & GRADES -->
@@ -236,6 +348,22 @@
           <canvas id="chartSebaran" height="180"></canvas>
         </div>
 
+        <!-- Card Analisis Pemahaman Soal & Materi -->
+        <div class="card-chart" id="cardAnalysis" style="display: none;">
+          <h3>📊 Analisis Pemahaman Soal & Materi</h3>
+          <div id="analysisSummaryText" style="font-size: 13px; color: #E2E8F0; line-height: 1.6; margin-bottom: 16px; padding: 12px; border-radius: 8px; border-left: 4px solid var(--color-primary); background: rgba(255,255,255,0.02);">
+            Memuat analisis pemahaman...
+          </div>
+          <div id="analysisQuestionsContainer" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <!-- Rincian analisis soal akan dirender di sini -->
+          </div>
+          <style>
+            @media (max-width: 600px) {
+              #analysisQuestionsContainer { grid-template-columns: 1fr; }
+            }
+          </style>
+        </div>
+
         <!-- Grade List Table -->
         <h3 font-family="var(--font-title)" style="margin: 20px 0 10px 0; color: #fff; font-size: 16px;">Daftar Nilai Masuk</h3>
         <table class="score-list">
@@ -247,12 +375,13 @@
               <th>Guru / Pengawas</th>
               <th>Benar/Total</th>
               <th>Skor</th>
+              <th>Pelanggaran</th>
               <th>Waktu Rekam</th>
             </tr>
           </thead>
           <tbody id="tableScoresBody">
             <tr>
-              <td colspan="6" style="text-align: center; color: var(--color-muted);">Belum ada data nilai masuk.</td>
+              <td colspan="8" style="text-align: center; color: var(--color-muted);">Belum ada data nilai masuk.</td>
             </tr>
           </tbody>
         </table>
@@ -288,6 +417,17 @@ Kunci: A</pre>
           </div>
         </div>
 
+        <div class="filter-row" style="margin-bottom: 16px;">
+          <div class="form-group" style="margin-bottom: 0;">
+            <label style="color: var(--color-primary);">Batas Toleransi Keluar (Anti-Cheat)</label>
+            <input type="number" class="form-control" id="examCheatLimitInput" placeholder="0 = Tanpa Batas, Contoh: 3" style="margin-top: 4px;" min="0" value="0">
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label style="color: var(--color-primary);">PIN Pembuka Ujian (4-8 Digit)</label>
+            <input type="password" class="form-control" id="examUnlockPinInput" placeholder="Contoh: 1234" maxlength="8" style="margin-top: 4px;">
+          </div>
+        </div>
+
         <textarea class="form-control" id="wordInputText" placeholder="Tempel (paste) teks soal dari Word Anda di sini..." style="height: 180px; font-family: monospace; font-size: 12px;" oninput="onWordTextInput()"></textarea>
         
         <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 12px;">
@@ -315,6 +455,32 @@ Kunci: A</pre>
             <div class="qr-desc" style="color:#000; font-weight:bold;">PINDAI UNTUK MEMULAI UJIAN</div>
           </div>
         </div>
+      </div>
+      <!-- TAB 3: DAFTAR UJIAN -->
+      <div class="tab-content" id="tContentExams">
+        <div style="background: rgba(16, 185, 129, 0.05); border-left: 4px solid var(--color-primary); padding: 12px; border-radius: 8px; font-size: 12px; color: #cbd5e1; margin-bottom: 16px; text-align: left;">
+          <h4 style="margin:0 0 6px 0; color: var(--color-primary);">📁 Daftar Ujian Yang Pernah Dibuat:</h4>
+          Ujian yang Anda buat disimpan secara permanen di browser ini dan/atau disinkronkan ke database Supabase (jika mode Hybrid aktif). Anda dapat melihat kembali QR Code, menyalin kode, mengedit, atau menghapusnya.
+        </div>
+
+        <table class="score-list" style="margin-top: 10px;">
+          <thead>
+            <tr>
+              <th>Mata Pelajaran</th>
+              <th>Guru / Pengawas</th>
+              <th>Jumlah Soal</th>
+              <th>Anti-Cheat</th>
+              <th>PIN Ujian</th>
+              <th>Tanggal Dibuat</th>
+              <th style="text-align: center;">Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="tableExamsBody">
+            <tr>
+              <td colspan="7" style="text-align: center; color: var(--color-muted);">Belum ada data ujian yang dibuat.</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
 
     </div>
@@ -404,11 +570,41 @@ Kunci: A</pre>
     </div>
   </div>
 
+  <!-- 3. EXAM CODE DETAILS MODAL -->
+  <div class="modal-overlay" id="modalExamCodeDetails">
+    <div class="modal" style="max-width: 500px; text-align: center;">
+      <h3 class="modal-title" id="mdExamTitle">Rincian Ujian</h3>
+      <p class="subtitle" id="mdExamSubtitle" style="margin-bottom: 15px;">Mata Pelajaran & Guru</p>
+      
+      <div class="form-group" style="text-align: left;">
+        <label>Kode Teks Soal</label>
+        <div style="display: flex; gap: 8px;">
+          <input type="text" class="form-control" id="mdOutputExamCode" readonly style="font-family: monospace; font-size: 11px;">
+          <button class="btn-action btn-action-primary" onclick="copyExamCodeFromModal()" style="max-width: 80px; padding: 10px; font-size: 12px;">Salin</button>
+        </div>
+      </div>
+
+      <div class="qr-container" style="margin-top: 15px; margin-bottom: 15px;">
+        <div id="mdQrcodeSoal"></div>
+        <div class="qr-desc" id="mdQrDesc" style="color:#000; font-weight:bold;">PINDAI UNTUK MEMULAI UJIAN</div>
+      </div>
+
+      <div class="btn-group">
+        <button class="btn-submit" onclick="closeExamCodeDetailsModal()" style="background-color: #334155; color: #FFF; width: 100%;">Tutup</button>
+      </div>
+    </div>
+  </div>
+
+
+
   <script>
     // --- APP GLOBAL STATE ---
     let activeScreenId = "screenLoginPin";
     const CORRECT_PIN = "99887766";
     const SECRET_HASH_SALT = "SCHOOL_PORTAL_SECRET_2026";
+    
+    // Teacher Profile/Account State
+    let activeTeacher = { id: "admin", name: "Admin", isAdmin: true };
 
     // Supabase State
     let syncMode = "offline";
@@ -421,11 +617,81 @@ Kunci: A</pre>
     let qrScannerInstance = null;
     let scoreChartInstance = null;
 
+    // --- local_grades_db & local_exams_db safe parsing helpers ---
+    function getLocalGrades() {
+      try {
+        const grades = JSON.parse(localStorage.getItem("local_grades_db") || "[]");
+        return Array.isArray(grades) ? grades : [];
+      } catch (e) {
+        console.warn("Resetting corrupted local_grades_db:", e);
+        return [];
+      }
+    }
+
+    function getLocalExams() {
+      try {
+        const stored = localStorage.getItem("local_exams_db");
+        if (!stored) return [];
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed)) {
+          return parsed;
+        } else if (typeof parsed === 'object' && parsed !== null) {
+          const arr = [];
+          Object.entries(parsed).forEach(([key, questions]) => {
+            const parts = key.split("|");
+            const subject = parts[0] || "Umum";
+            const teacher = parts[1] || "Umum";
+            const payload = {
+              questions: questions,
+              subject: subject,
+              teacher: teacher
+            };
+            const jsonString = JSON.stringify(payload);
+            let code = "";
+            try {
+              code = safeBase64Encode(jsonString);
+            } catch (err) {}
+            
+            arr.push({
+              id: "legacy_" + Math.random().toString(36).substr(2, 9),
+              subject: subject,
+              teacher: teacher,
+              created_at: new Date().toLocaleDateString("id-ID") + " (Legacy)",
+              questions: questions,
+              code: code,
+              cheatLimit: 0,
+              pin: "",
+              supabase_id: ""
+            });
+          });
+          localStorage.setItem("local_exams_db", JSON.stringify(arr));
+          return arr;
+        }
+        return [];
+      } catch (e) {
+        console.warn("Resetting corrupted local_exams_db:", e);
+        return [];
+      }
+    }
+
+    function safeBase64Encode(str) {
+      try {
+        const bytes = new TextEncoder().encode(str);
+        let binString = "";
+        for (let i = 0; i < bytes.length; i++) {
+          binString += String.fromCharCode(bytes[i]);
+        }
+        return btoa(binString);
+      } catch (e) {
+        return btoa(unescape(encodeURIComponent(str)));
+      }
+    }
+
     // --- INITIALIZATION ---
     window.onload = function() {
       // Muat data lokal
       const title = localStorage.getItem("cfg_school_title") || "PORTAL HUB SEKOLAH";
-      document.getElementById("txtSchoolTitleMain").innerText = "PORTAL GURU - " + title;
+      document.getElementById("txtSchoolTitleMain").innerText = "dashboard guru";
 
       // Set default Guru
       const defaultTeacher = localStorage.getItem("cfg_teacher_name") || "";
@@ -458,6 +724,12 @@ Kunci: A</pre>
           .catch(err => console.log("Service Worker Registration Failed", err));
       }
 
+      // Populate teacher profiles
+      populateLoginTeacherDropdown();
+      if (syncMode === "hybrid" && supabaseUrl && supabaseKey) {
+        syncTeachersFromSupabase().then(() => populateLoginTeacherDropdown());
+      }
+
       // Load tabel nilai
       refreshTeacherScoresTable();
       
@@ -472,6 +744,34 @@ Kunci: A</pre>
         if (syncMode === "hybrid" && supabaseUrl && supabaseKey) {
           startAutoSyncInterval();
         }
+      }
+
+      // Pasting image converter to Base64 in textarea
+      const wordInput = document.getElementById("wordInputText");
+      if (wordInput) {
+        wordInput.addEventListener("paste", function(e) {
+          const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+          for (let index in items) {
+            const item = items[index];
+            if (item.kind === 'file' && item.type.indexOf('image') !== -1) {
+              const blob = item.getAsFile();
+              const reader = new FileReader();
+              reader.onload = function(event) {
+                const base64 = event.target.result;
+                const imgTag = `\n<img src="${base64}" style="max-width: 100%; height: auto; display: block; margin: 10px auto; border-radius: 8px;">\n`;
+                
+                const startPos = wordInput.selectionStart;
+                const endPos = wordInput.selectionEnd;
+                const text = wordInput.value;
+                wordInput.value = text.substring(0, startPos) + imgTag + text.substring(endPos);
+                
+                wordInput.dispatchEvent(new Event('input'));
+              };
+              reader.readAsDataURL(blob);
+              e.preventDefault();
+            }
+          }
+        });
       }
     };
 
@@ -493,25 +793,107 @@ Kunci: A</pre>
     }
 
     function verifyLoginPinSubmit() {
+      const mode = document.getElementById("loginTeacherSelect").value;
       const pinInput = document.getElementById("loginPinField").value;
-      if (pinInput === CORRECT_PIN) {
-        document.getElementById("loginPinField").value = "";
-        navigateToScreen("screenTeacherDashboard");
-        renderDashboardCharts();
-        
-        // Start Auto-Sync if hybrid
-        if (syncMode === "hybrid" && supabaseUrl && supabaseKey) {
-          startAutoSyncInterval();
+
+      if (mode === "admin") {
+        // Master login
+        if (pinInput === CORRECT_PIN) {
+          document.getElementById("loginPinField").value = "";
+          activeTeacher = { id: "admin", name: "Admin", isAdmin: true };
+          onTeacherLoginSuccess();
+        } else {
+          alert("PIN Pengawas Master Salah!");
+          document.getElementById("loginPinField").value = "";
         }
       } else {
-        alert("PIN Pengawas Salah!");
-        document.getElementById("loginPinField").value = "";
+        // Individual teacher login or register
+        const nameInput = document.getElementById("loginTeacherNameField").value.trim();
+        if (!nameInput) {
+          alert("Nama lengkap guru wajib diisi!");
+          return;
+        }
+        if (nameInput.toLowerCase() === "admin") {
+          alert("Nama 'Admin' tidak boleh digunakan!");
+          return;
+        }
+        if (!pinInput.match(/^\d{4,8}$/)) {
+          alert("PIN harus berupa 4 sampai 8 digit angka!");
+          return;
+        }
+
+        const teachers = getLocalTeachers();
+        const teacher = teachers.find(t => t.name.toLowerCase() === nameInput.toLowerCase());
+
+        if (teacher) {
+          // Verify existing teacher's PIN
+          const hashed = hashPin(pinInput);
+          if (hashed === teacher.pin_hash) {
+            document.getElementById("loginPinField").value = "";
+            document.getElementById("loginTeacherNameField").value = "";
+            activeTeacher = { id: teacher.id, name: teacher.name, isAdmin: false };
+            onTeacherLoginSuccess();
+          } else {
+            alert("PIN Guru Salah!");
+            document.getElementById("loginPinField").value = "";
+          }
+        } else {
+          // Register new teacher
+          if (confirm(`Akun Guru dengan nama "${nameInput}" belum terdaftar.\nApakah Anda ingin mendaftarkan akun baru dengan PIN yang dimasukkan?`)) {
+            const newTeacher = {
+              id: "teacher_" + Date.now() + "_" + Math.random().toString(36).substr(2, 5),
+              name: nameInput,
+              pin_hash: hashPin(pinInput)
+            };
+
+            teachers.push(newTeacher);
+            localStorage.setItem("local_teachers_db", JSON.stringify(teachers));
+
+            // Sync to Supabase in Hybrid mode
+            if (syncMode === "hybrid" && supabaseUrl && supabaseKey) {
+              try {
+                fetch(`${supabaseUrl}/rest/v1/teachers`, {
+                  method: "POST",
+                  headers: {
+                    "apikey": supabaseKey,
+                    "Authorization": `Bearer ${supabaseKey}`,
+                    "Content-Type": "application/json"
+                  },
+                  body: JSON.stringify({
+                    id: newTeacher.id,
+                    name: newTeacher.name,
+                    pin_hash: newTeacher.pin_hash
+                  })
+                }).then(res => {
+                  if (res.ok) {
+                    console.log("Teacher profile synced online to Supabase");
+                  } else {
+                    console.warn("Failed to sync teacher profile to Supabase: " + res.status);
+                  }
+                }).catch(err => {
+                  console.warn("Error calling Supabase for teacher sync:", err);
+                });
+              } catch (e) {
+                console.warn(e);
+              }
+            }
+
+            document.getElementById("loginPinField").value = "";
+            document.getElementById("loginTeacherNameField").value = "";
+            activeTeacher = { id: newTeacher.id, name: newTeacher.name, isAdmin: false };
+            
+            alert(`✓ Akun Guru "${nameInput}" berhasil didaftarkan!`);
+            onTeacherLoginSuccess();
+          }
+        }
       }
     }
 
     function exitToLogin() {
       stopAutoSyncInterval();
+      activeTeacher = { id: "admin", name: "Admin", isAdmin: true };
       navigateToScreen("screenLoginPin");
+      populateLoginTeacherDropdown();
       setTimeout(() => document.getElementById("loginPinField").focus(), 300);
     }
 
@@ -581,7 +963,7 @@ Kunci: A</pre>
       supabaseUrl = sUrl;
       supabaseKey = sKey;
 
-      document.getElementById("txtSchoolTitleMain").innerText = "PORTAL GURU - " + title;
+      document.getElementById("txtSchoolTitleMain").innerText = "dashboard guru";
       
       updateDbSyncStatusUI();
       if (syncMode === "hybrid") {
@@ -616,27 +998,32 @@ Kunci: A</pre>
           }
 
           // Verifikasi Tanda Tangan
+          const sigParts = (res.sig || "").split("|");
+          const signatureOnly = sigParts[0];
+          const correctsData = sigParts[1] || "";
+
           let expectedSig = generateSignature(res.name, res.cls, res.score, res.cor, res.tot, res.subject, res.teacher);
-          if (res.sig !== expectedSig) {
+          let sigVerified = (signatureOnly === expectedSig);
+          if (!sigVerified) {
             // Coba legacy fallback
             const legacySig = generateSignature(res.name, res.cls, res.score, res.cor, res.tot, "", "");
-            if (res.sig === legacySig) {
-              expectedSig = legacySig;
+            if (signatureOnly === legacySig) {
+              sigVerified = true;
             } else if (res.subject) {
               const subjectOnlySig = generateSignature(res.name, res.cls, res.score, res.cor, res.tot, res.subject, "");
-              if (res.sig === subjectOnlySig) {
-                expectedSig = subjectOnlySig;
+              if (signatureOnly === subjectOnlySig) {
+                sigVerified = true;
               }
             }
           }
-          if (res.sig !== expectedSig) {
+          if (!sigVerified) {
             alert("⚠️ PERINGATAN: Tanda tangan QR tidak cocok! Nilai siswa ini kemungkinan telah dimanipulasi.");
             stopQrScanning();
             return;
           }
 
           // Simpan Nilai secara Lokal
-          const currentScores = JSON.parse(localStorage.getItem("local_grades_db") || "[]");
+          const currentScores = getLocalGrades();
           
           // Deduplikasi berdasarkan Nama + Kelas + Mata Pelajaran
           const isExist = currentScores.some(s => 
@@ -656,6 +1043,8 @@ Kunci: A</pre>
               score: res.score,
               correct: res.cor,
               total: res.tot,
+              corrects: correctsData,
+              cheatCount: res.cht || 0,
               time: new Date().toLocaleTimeString("id-ID", { hour: '2-digit', minute: '2-digit' })
             });
             localStorage.setItem("local_grades_db", JSON.stringify(currentScores));
@@ -724,7 +1113,7 @@ Kunci: A</pre>
       let dupCount = 0;
       let failCount = 0;
 
-      const currentScores = JSON.parse(localStorage.getItem("local_grades_db") || "[]");
+      const currentScores = getLocalGrades();
 
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
@@ -741,20 +1130,25 @@ Kunci: A</pre>
             }
 
             // Verifikasi Tanda Tangan Kripto
+            const sigParts = (res.sig || "").split("|");
+            const signatureOnly = sigParts[0];
+            const correctsData = sigParts[1] || "";
+
             let expectedSig = generateSignature(res.name, res.cls, res.score, res.cor, res.tot, res.subject, res.teacher);
-            if (res.sig !== expectedSig) {
+            let sigVerified = (signatureOnly === expectedSig);
+            if (!sigVerified) {
               // Coba legacy fallback
               const legacySig = generateSignature(res.name, res.cls, res.score, res.cor, res.tot, "", "");
-              if (res.sig === legacySig) {
-                expectedSig = legacySig;
+              if (signatureOnly === legacySig) {
+                sigVerified = true;
               } else if (res.subject) {
                 const subjectOnlySig = generateSignature(res.name, res.cls, res.score, res.cor, res.tot, res.subject, "");
-                if (res.sig === subjectOnlySig) {
-                  expectedSig = subjectOnlySig;
+                if (signatureOnly === subjectOnlySig) {
+                  sigVerified = true;
                 }
               }
             }
-            if (res.sig !== expectedSig) {
+            if (!sigVerified) {
               console.warn(`Tanda tangan tidak cocok untuk file: ${file.name}`);
               failCount++;
             } else {
@@ -775,6 +1169,8 @@ Kunci: A</pre>
                   score: res.score,
                   correct: res.cor,
                   total: res.tot,
+                  corrects: correctsData,
+                  cheatCount: res.cht || 0,
                   time: new Date().toLocaleTimeString("id-ID", { hour: '2-digit', minute: '2-digit' })
                 });
                 successCount++;
@@ -823,7 +1219,13 @@ Kunci: A</pre>
       stopAutoSyncInterval();
       if (syncMode === "hybrid" && supabaseUrl && supabaseKey) {
         syncGradesFromSupabase();
-        autoSyncTimer = setInterval(syncGradesFromSupabase, 10000);
+        syncExamsFromSupabase();
+        syncTeachersFromSupabase();
+        autoSyncTimer = setInterval(() => {
+          syncGradesFromSupabase();
+          syncExamsFromSupabase();
+          syncTeachersFromSupabase();
+        }, 10000);
         console.log("Auto-Sync database started.");
       }
     }
@@ -854,24 +1256,29 @@ Kunci: A</pre>
         const data = await res.json();
         if (!Array.isArray(data)) return 0;
         
-        const currentScores = JSON.parse(localStorage.getItem("local_grades_db") || "[]");
+        const currentScores = getLocalGrades();
         let addedCount = 0;
         
         data.forEach(item => {
+          const sigParts = (item.sig || "").split("|");
+          const signatureOnly = sigParts[0];
+          const correctsData = sigParts[1] || "";
+
           let calculatedSig = generateSignature(item.name, item.cls, item.score, item.correct, item.total, item.subject, item.teacher);
-          if (item.sig !== calculatedSig) {
+          let sigVerified = (signatureOnly === calculatedSig);
+          if (!sigVerified) {
             // Coba legacy fallback
             const legacySig = generateSignature(item.name, item.cls, item.score, item.correct, item.total, "", "");
-            if (item.sig === legacySig) {
-              calculatedSig = legacySig;
+            if (signatureOnly === legacySig) {
+              sigVerified = true;
             } else if (item.subject) {
               const subjectOnlySig = generateSignature(item.name, item.cls, item.score, item.correct, item.total, item.subject, "");
-              if (item.sig === subjectOnlySig) {
-                calculatedSig = subjectOnlySig;
+              if (signatureOnly === subjectOnlySig) {
+                sigVerified = true;
               }
             }
           }
-          if (item.sig !== calculatedSig) {
+          if (!sigVerified) {
             console.warn(`[Supabase Sync] Signature mismatch for student: ${item.name}. Data discarded.`);
             return;
           }
@@ -892,6 +1299,8 @@ Kunci: A</pre>
               score: item.score,
               correct: item.correct,
               total: item.total,
+              corrects: correctsData,
+              cheatCount: item.cheat_count || 0,
               time: item.time || new Date().toLocaleTimeString("id-ID", { hour: '2-digit', minute: '2-digit' })
             });
             addedCount++;
@@ -938,16 +1347,25 @@ Kunci: A</pre>
     function switchTeacherTab(tabId) {
       document.getElementById("tabBtnStat").classList.remove("active");
       document.getElementById("tabBtnImport").classList.remove("active");
+      document.getElementById("tabBtnExamsList").classList.remove("active");
       document.getElementById("tContentStat").classList.remove("active");
       document.getElementById("tContentImport").classList.remove("active");
+      document.getElementById("tContentExams").classList.remove("active");
 
       if (tabId === 'stat') {
         document.getElementById("tabBtnStat").classList.add("active");
         document.getElementById("tContentStat").classList.add("active");
         renderDashboardCharts();
-      } else {
+      } else if (tabId === 'import') {
         document.getElementById("tabBtnImport").classList.add("active");
         document.getElementById("tContentImport").classList.add("active");
+      } else if (tabId === 'exams') {
+        document.getElementById("tabBtnExamsList").classList.add("active");
+        document.getElementById("tContentExams").classList.add("active");
+        refreshTeacherExamsTable();
+        if (syncMode === "hybrid" && supabaseUrl && supabaseKey) {
+          syncExamsFromSupabase().then(() => refreshTeacherExamsTable());
+        }
       }
     }
 
@@ -1006,6 +1424,11 @@ Kunci: A</pre>
           }
         });
 
+        // Ensure currently logged-in teacher is in the list
+        if (activeTeacher && !activeTeacher.isAdmin && !uniqueTeachers.some(t => t.toLowerCase() === activeTeacher.name.toLowerCase())) {
+          uniqueTeachers.push(activeTeacher.name);
+        }
+
         const uniqueTeachersJson = JSON.stringify(uniqueTeachers);
         if (uniqueTeachersJson !== lastUniqueTeachersJson) {
           lastUniqueTeachersJson = uniqueTeachersJson;
@@ -1017,7 +1440,9 @@ Kunci: A</pre>
             opt.innerText = t === "all" ? "Semua Guru" : t;
             teacherSelect.appendChild(opt);
           });
-          if (uniqueTeachers.includes(currentVal)) {
+          if (activeTeacher && !activeTeacher.isAdmin) {
+            teacherSelect.value = activeTeacher.name;
+          } else if (uniqueTeachers.includes(currentVal)) {
             teacherSelect.value = currentVal;
           } else {
             teacherSelect.value = "all";
@@ -1028,7 +1453,7 @@ Kunci: A</pre>
 
     // --- GURU: REFRESH TABLE ---
     function refreshTeacherScoresTable() {
-      const scores = JSON.parse(localStorage.getItem("local_grades_db") || "[]");
+      const scores = getLocalGrades();
       const tbody = document.getElementById("tableScoresBody");
       tbody.innerHTML = "";
 
@@ -1051,7 +1476,7 @@ Kunci: A</pre>
       });
 
       if (filteredScores.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--color-muted);">Belum ada data nilai untuk filter ini.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: var(--color-muted);">Belum ada data nilai untuk filter ini.</td></tr>`;
         document.getElementById("statTotal").innerText = 0;
         document.getElementById("statRata").innerText = 0;
         document.getElementById("statLulus").innerText = 0;
@@ -1065,6 +1490,9 @@ Kunci: A</pre>
         totalScore += s.score;
         if (s.score >= 75) lulusCount++;
 
+        const cheatVal = s.cheatCount !== undefined ? s.cheatCount : 0;
+        const cheatStyle = cheatVal > 0 ? 'color: var(--color-danger); font-weight: bold;' : 'color: var(--color-success);';
+
         const tr = document.createElement("tr");
         tr.innerHTML = `
           <td><b>${s.name}</b></td>
@@ -1073,6 +1501,7 @@ Kunci: A</pre>
           <td>${s.teacher || 'Umum'}</td>
           <td>${s.correct}/${s.total}</td>
           <td style="color:${s.score >= 75 ? 'var(--color-primary)':'var(--color-danger)'}; font-weight:bold;">${s.score}</td>
+          <td style="${cheatStyle}">${cheatVal}x</td>
           <td style="color:var(--color-muted);">${s.time}</td>
         `;
         tbody.appendChild(tr);
@@ -1081,11 +1510,14 @@ Kunci: A</pre>
       document.getElementById("statTotal").innerText = filteredScores.length;
       document.getElementById("statRata").innerText = Math.round(totalScore / filteredScores.length);
       document.getElementById("statLulus").innerText = lulusCount;
+
+      // Jalankan analisis pemahaman soal berdasarkan data ter-filter
+      updateQuestionAnalysis();
     }
 
     // --- GURU: CHART DRAWING ---
     function renderDashboardCharts() {
-      const scores = JSON.parse(localStorage.getItem("local_grades_db") || "[]");
+      const scores = getLocalGrades();
       const selectedSubject = document.getElementById("filterSubjectSelect") ? document.getElementById("filterSubjectSelect").value : "all";
       const selectedTeacher = document.getElementById("filterTeacherSelect") ? document.getElementById("filterTeacherSelect").value : "all";
 
@@ -1144,6 +1576,246 @@ Kunci: A</pre>
       });
     }
 
+    // --- GURU: QUESTION ANALYSIS SYSTEM ---
+    let examQuestionsCache = {};
+
+    async function fetchExamQuestionsOnline(subject, teacher) {
+      if (syncMode !== "hybrid" || !supabaseUrl || !supabaseKey) return;
+      if (!subject || subject === "all") return;
+
+      const cacheKey = `${subject.toLowerCase()}|${(teacher || "all").toLowerCase()}`;
+      if (examQuestionsCache[cacheKey]) return;
+
+      try {
+        let url = `${supabaseUrl}/rest/v1/exams?subject=eq.${encodeURIComponent(subject)}`;
+        if (teacher && teacher !== "all") {
+          url += `&teacher=eq.${encodeURIComponent(teacher)}`;
+        }
+        const res = await fetch(url, {
+          method: "GET",
+          headers: {
+            "apikey": supabaseKey,
+            "Authorization": `Bearer ${supabaseKey}`,
+            "Content-Type": "application/json"
+          }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.length > 0) {
+            examQuestionsCache[cacheKey] = data[0].questions;
+            // Panggil update analysis setelah data didapatkan
+            updateQuestionAnalysis();
+          }
+        }
+      } catch (err) {
+        console.error("Gagal mengambil soal dari database online:", err);
+      }
+    }
+
+    function getQuestionsForSubject(subject, teacher) {
+      if (!subject || subject === "all") return null;
+      const key = `${subject.toLowerCase()}|${(teacher || "all").toLowerCase()}`;
+      
+      // 1. Cek cache memori
+      if (examQuestionsCache[key]) return examQuestionsCache[key];
+ 
+      // 2. Cek local storage (local_exams_db)
+      const localExams = getLocalExams();
+      let match = localExams.find(e => 
+        (e.subject || "Umum").toLowerCase() === subject.toLowerCase() && 
+        (e.teacher || "Umum").toLowerCase() === (teacher || "all").toLowerCase()
+      );
+      if (match) return match.questions;
+ 
+      // 3. Cek mata pelajaran saja jika guru tidak cocok
+      match = localExams.find(e => (e.subject || "Umum").toLowerCase() === subject.toLowerCase());
+      if (match) return match.questions;
+ 
+      return null;
+    }
+
+    function extractTopic(questionText) {
+      if (!questionText) return "Topik Umum";
+      // Buang nomor soal di depan jika ada
+      let clean = questionText.replace(/^\d+[\.\)\s]+/, "").trim();
+      
+      // Bersihkan kata tanya pembuka bahasa Indonesia
+      clean = clean.replace(/^(siapakah|siapa|apakah|apa|manakah|mana|berapakah|berapa|bagaimanakah|bagaimana|mengapakah|mengapa|kapan|kapankah|dimanakah|dimana|dari mana|ke mana)\s+/i, "");
+      
+      // Huruf besar pada karakter pertama
+      clean = clean.charAt(0).toUpperCase() + clean.slice(1);
+      
+      // Buang tanda tanya di akhir
+      clean = clean.replace(/\?+$/, "").trim();
+      
+      // Potong jika terlalu panjang
+      if (clean.length > 60) {
+        clean = clean.substring(0, 57) + "...";
+      }
+      return clean;
+    }
+
+    function updateQuestionAnalysis() {
+      const cardAnalysis = document.getElementById("cardAnalysis");
+      if (!cardAnalysis) return;
+
+      const scores = getLocalGrades();
+      const selectedSubject = document.getElementById("filterSubjectSelect") ? document.getElementById("filterSubjectSelect").value : "all";
+      const selectedTeacher = document.getElementById("filterTeacherSelect") ? document.getElementById("filterTeacherSelect").value : "all";
+
+      // Filter data nilai
+      const filteredScores = scores.filter(s => {
+        const scoreSubject = s.subject || "Umum";
+        const scoreTeacher = s.teacher || "Umum";
+        const matchSubject = (selectedSubject === "all" || scoreSubject.toLowerCase() === selectedSubject.toLowerCase());
+        const matchTeacher = (selectedTeacher === "all" || scoreTeacher.toLowerCase() === selectedTeacher.toLowerCase());
+        return matchSubject && matchTeacher;
+      });
+
+      // Sembunyikan card jika data kosong atau tidak memilih mata pelajaran tertentu
+      if (filteredScores.length === 0 || selectedSubject === "all") {
+        cardAnalysis.style.display = "none";
+        return;
+      }
+
+      // Picu pengambilan soal dari database jika belum ada di cache
+      const cacheKey = `${selectedSubject.toLowerCase()}|${selectedTeacher.toLowerCase()}`;
+      if (!examQuestionsCache[cacheKey]) {
+        fetchExamQuestionsOnline(selectedSubject, selectedTeacher);
+      }
+
+      // Cari siswa yang memiliki rincian pemahaman biner corrects
+      const studentsWithData = filteredScores.filter(s => s.corrects && s.corrects.length > 0);
+      if (studentsWithData.length === 0) {
+        cardAnalysis.style.display = "block";
+        document.getElementById("analysisSummaryText").innerHTML = `ℹ️ <b>Analisis belum tersedia</b>: Data nilai yang masuk tidak menyertakan rincian pemahaman soal. Silakan lakukan scan nilai baru atau impor file nilai hasil ujian terbaru.`;
+        document.getElementById("analysisSummaryText").style.background = "rgba(255,255,255,0.02)";
+        document.getElementById("analysisSummaryText").style.borderLeftColor = "var(--color-primary)";
+        document.getElementById("analysisQuestionsContainer").innerHTML = "";
+        return;
+      }
+
+      // Ambil sampel corrects untuk menentukan jumlah soal
+      const sampleCorrects = studentsWithData[0].corrects.split(",");
+      const totalQuestions = sampleCorrects.length;
+
+      // Hitung jumlah jawaban benar per nomor soal
+      const questionCorrectCounts = Array(totalQuestions).fill(0);
+      studentsWithData.forEach(student => {
+        const arr = student.corrects.split(",");
+        for (let i = 0; i < totalQuestions; i++) {
+          if (arr[i] === "1") {
+            questionCorrectCounts[i]++;
+          }
+        }
+      });
+
+      // Dapatkan data pertanyaan
+      const questionsObj = getQuestionsForSubject(selectedSubject, selectedTeacher);
+
+      let html = "";
+      let lowestIndex = -1;
+      let lowestPct = 101;
+
+      for (let i = 0; i < totalQuestions; i++) {
+        const pct = Math.round((questionCorrectCounts[i] / studentsWithData.length) * 100);
+        if (pct < lowestPct) {
+          lowestPct = pct;
+          lowestIndex = i;
+        }
+
+        let qText = `Soal No. ${i + 1}`;
+        if (questionsObj && questionsObj[i]) {
+          let q = questionsObj[i];
+          if (typeof q === 'string') {
+            if (q.startsWith("@{") && q.endsWith("}")) {
+              const pertMatch = q.match(/pertanyaan=([^;\}]+)/);
+              if (pertMatch) qText = `Soal No. ${i + 1}: ${pertMatch[1]}`;
+            } else {
+              qText = `Soal No. ${i + 1}: ${q}`;
+            }
+          } else if (q.pertanyaan) {
+            qText = `Soal No. ${i + 1}: ${q.pertanyaan}`;
+          }
+        }
+
+        let statusColor = "var(--color-success)";
+        let statusText = "Siswa memahami dengan baik";
+        if (pct < 50) {
+          statusColor = "var(--color-danger)";
+          statusText = "Siswa kurang memahami (Butuh remedial!)";
+        } else if (pct < 75) {
+          statusColor = "var(--color-warning)";
+          statusText = "Cukup dipahami";
+        }
+
+        html += `
+          <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 12px; border-radius: 12px; display: flex; flex-direction: column; gap: 4px;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
+              <span style="font-size: 13px; font-weight: 500; color: #FFF; line-height: 1.4; text-align: left;">${qText}</span>
+              <span style="background: ${statusColor}15; color: ${statusColor}; font-size: 13px; font-weight: bold; padding: 4px 8px; border-radius: 8px; white-space: nowrap;">${pct}% Benar</span>
+            </div>
+            <div style="font-size: 11px; color: var(--color-muted); display: flex; align-items: center; gap: 6px; text-align: left;">
+              <span style="width: 6px; height: 6px; border-radius: 50%; background-color: ${statusColor}; display: inline-block;"></span>
+              <span>${statusText} (${questionCorrectCounts[i]}/${studentsWithData.length} siswa)</span>
+            </div>
+          </div>
+        `;
+      }
+
+      // Bangun kesimpulan ringkasan untuk banyak topik
+      let summaryText = "";
+      const remedialTopics = [];
+      const warningTopics = [];
+
+      for (let i = 0; i < totalQuestions; i++) {
+        const pct = Math.round((questionCorrectCounts[i] / studentsWithData.length) * 100);
+        let topicName = `Soal No. ${i + 1}`;
+        if (questionsObj && questionsObj[i]) {
+          let q = questionsObj[i];
+          let pText = "";
+          if (typeof q === 'string') {
+            if (q.startsWith("@{") && q.endsWith("}")) {
+              const pertMatch = q.match(/pertanyaan=([^;\}]+)/);
+              if (pertMatch) pText = pertMatch[1];
+            } else {
+              pText = q;
+            }
+          } else if (q.pertanyaan) {
+            pText = q.pertanyaan;
+          }
+          if (pText) {
+            topicName = `"${extractTopic(pText)}"`;
+          }
+        }
+
+        if (pct < 50) {
+          remedialTopics.push(`<li>Materi <b>${topicName}</b> (Soal No. ${i + 1}): Hanya <b>${pct}%</b> siswa yang memahami.</li>`);
+        } else if (pct < 75) {
+          warningTopics.push(`<li>Materi <b>${topicName}</b> (Soal No. ${i + 1}): <b>${pct}%</b> pemahaman.</li>`);
+        }
+      }
+
+      const summaryTextElement = document.getElementById("analysisSummaryText");
+      if (remedialTopics.length > 0) {
+        summaryTextElement.style.background = "rgba(239, 68, 68, 0.08)";
+        summaryTextElement.style.borderLeftColor = "var(--color-danger)";
+        summaryText = `⚠️ <b>Kebutuhan Remedial Kelas</b>: Siswa kurang memahami beberapa materi berikut (di bawah 50%):<ul style="margin: 8px 0 0 0; padding-left: 20px; text-align: left; line-height: 1.5;">${remedialTopics.join("")}</ul><p style="margin: 8px 0 0 0; text-align: left;">Disarankan melakukan pengulangan materi di atas.</p>`;
+      } else if (warningTopics.length > 0) {
+        summaryTextElement.style.background = "rgba(245, 158, 11, 0.08)";
+        summaryTextElement.style.borderLeftColor = "var(--color-warning)";
+        summaryText = `⚠️ <b>Evaluasi Kelas</b>: Siswa cukup memahami, namun perlu penguatan pada materi berikut (50% - 74%):<ul style="margin: 8px 0 0 0; padding-left: 20px; text-align: left; line-height: 1.5;">${warningTopics.join("")}</ul>`;
+      } else {
+        summaryTextElement.style.background = "rgba(16, 185, 129, 0.08)";
+        summaryTextElement.style.borderLeftColor = "var(--color-success)";
+        summaryText = `✓ <b>Analisis Kelas</b>: Luar biasa! Seluruh materi/topik ujian telah dipahami dengan sangat baik oleh siswa (tingkat pemahaman minimal 75% ke atas).`;
+      }
+
+      document.getElementById("analysisSummaryText").innerHTML = summaryText;
+      document.getElementById("analysisQuestionsContainer").innerHTML = html;
+      cardAnalysis.style.display = "block";
+    }
+
     // --- GURU: WORD PARSER ENGINE ---
     function onWordTextInput() {
       const text = document.getElementById("wordInputText").value;
@@ -1199,100 +1871,445 @@ Kunci: A</pre>
       return questions;
     }
 
-    async function generateExamCodeFromParsed() {
-      if (parsedWordQuestions.length === 0) return;
+    function hashPin(pin) {
+      if (!pin) return "";
+      const salted = pin + "SECRET_UNLOCK_SALT_2026";
+      let hash = 0;
+      for (let i = 0; i < salted.length; i++) {
+        hash = ((hash << 5) - hash) + salted.charCodeAt(i);
+        hash = hash & hash;
+      }
+      return Math.abs(hash).toString(16);
+    }
 
-      const missingKey = parsedWordQuestions.filter(q => !q.kunci);
-      if (missingKey.length > 0) {
-        alert(`Ujian gagal dibuat! Ada ${missingKey.length} soal yang belum memiliki Kunci Jawaban. Silakan lengkapi dengan baris 'Kunci: A/B/C/D/E' di file Word Anda.`);
+    async function generateExamCodeFromParsed() {
+      try {
+        if (parsedWordQuestions.length === 0) return;
+
+        const missingKey = parsedWordQuestions.filter(q => !q.kunci);
+        if (missingKey.length > 0) {
+          alert(`Ujian gagal dibuat! Ada ${missingKey.length} soal yang belum memiliki Kunci Jawaban. Silakan lengkapi dengan baris 'Kunci: A/B/C/D/E' di file Word Anda.`);
+          return;
+        }
+
+        const subjectName = document.getElementById("examSubjectInput").value.trim() || "Umum";
+        const teacherName = document.getElementById("examTeacherInput").value.trim() || "Umum";
+        localStorage.setItem("cfg_teacher_name", teacherName);
+
+        const cheatLimitInput = document.getElementById("examCheatLimitInput");
+        const cheatLimit = cheatLimitInput ? (parseInt(cheatLimitInput.value) || 0) : 0;
+        const examUnlockPinInput = document.getElementById("examUnlockPinInput");
+        const pinVal = examUnlockPinInput ? examUnlockPinInput.value.trim() : "";
+        const unlockPinHash = pinVal ? hashPin(pinVal) : "";
+
+        // Sisipkan setelan sinkronisasi database online milik guru ke dalam kode ujian!
+        const syncConfig = {
+          mode: localStorage.getItem("cfg_sync_mode") || "offline",
+          url: localStorage.getItem("cfg_supabase_url") || "",
+          key: localStorage.getItem("cfg_supabase_key") || "",
+          cheatLimit: cheatLimit,
+          unlockPinHash: unlockPinHash
+        };
+
+        const examPayload = {
+          questions: parsedWordQuestions,
+          sync: syncConfig,
+          subject: subjectName,
+          teacher: teacherName,
+          cheatLimit: cheatLimit,
+          unlockPinHash: unlockPinHash
+        };
+
+        const jsonString = JSON.stringify(examPayload);
+        const base64Code = safeBase64Encode(jsonString);
+
+        document.getElementById("txtOutputExamCode").value = base64Code;
+        document.getElementById("examCodeOutputArea").style.display = "block";
+
+        const qrContainer = document.getElementById("qrcodeSoalGuru");
+        qrContainer.innerHTML = "⏳ Menyiapkan QR Code...";
+
+        // Create the local exam entry
+        const localExams = getLocalExams();
+        const examId = "exam_" + Date.now() + "_" + Math.random().toString(36).substr(2, 5);
+        const createdDate = new Date().toLocaleDateString("id-ID") + " " + new Date().toLocaleTimeString("id-ID", { hour: '2-digit', minute: '2-digit' });
+
+        const newExamEntry = {
+          id: examId,
+          subject: subjectName,
+          teacher: teacherName,
+          created_at: createdDate,
+          questions: parsedWordQuestions,
+          code: base64Code,
+          cheatLimit: cheatLimit,
+          pin: pinVal,
+          supabase_id: ""
+        };
+
+        // Jika menggunakan database online (hybrid), unggah ke Supabase untuk mendapatkan QR Code berisi link yang sangat pendek & mudah discan
+        if (syncConfig.mode === "hybrid" && syncConfig.url && syncConfig.key) {
+          try {
+            const res = await fetch(`${syncConfig.url}/rest/v1/exams`, {
+              method: "POST",
+              headers: {
+                "apikey": syncConfig.key,
+                "Authorization": `Bearer ${syncConfig.key}`,
+                "Content-Type": "application/json",
+                "Prefer": "return=representation"
+              },
+              body: JSON.stringify({
+                questions: parsedWordQuestions,
+                sync: syncConfig,
+                subject: subjectName,
+                teacher: teacherName
+              })
+            });
+
+            if (!res.ok) throw new Error("Gagal mengunggah soal");
+            const data = await res.json();
+            const supabaseExamId = data[0].id;
+            
+            // Simpan supabase_id ke entry lokal kita
+            newExamEntry.supabase_id = supabaseExamId;
+            
+            // Generate QR Code berisi Link Ujian Siswa (Sangat Pendek & Mudah Di-scan dari jauh!)
+            const studentUrl = `https://qirif13.github.io/APPUJIANS/SchoolPortalSiswa/?exam_id=${supabaseExamId}`;
+            
+            qrContainer.innerHTML = "";
+            new QRCode(qrContainer, {
+              text: studentUrl,
+              width: 200,
+              height: 200,
+              correctLevel: QRCode.CorrectLevel.M
+            });
+
+            const qrDesc = document.querySelector(".qr-desc");
+            if (qrDesc) qrDesc.innerHTML = "PINDAI UNTUK MULAI UJIAN (ONLINE QR)";
+            alert("✓ Sukses! Soal ujian berhasil diunggah ke database. QR Code Link telah dibuat.");
+          } catch (err) {
+            console.warn("Gagal membuat QR Online, menggunakan fallback QR offline:", err);
+            // Fallback: Tampilkan QR Code offline (Base64) jika offline atau gagal upload
+            try {
+              qrContainer.innerHTML = "";
+              new QRCode(qrContainer, {
+                text: base64Code,
+                width: 200,
+                height: 200,
+                correctLevel: QRCode.CorrectLevel.M
+              });
+              const qrDesc = document.querySelector(".qr-desc");
+              if (qrDesc) qrDesc.innerHTML = "PINDAI UNTUK MULAI UJIAN (OFFLINE QR)";
+              alert("✓ Sukses! Kode Ujian & QR Code Ujian berhasil di-generate.");
+            } catch (e) {
+              qrContainer.innerHTML = "<div style='color:var(--color-danger); font-size:11px; padding: 15px; font-weight: bold;'>Soal terlalu panjang untuk QR Code offline.<br>Silakan gunakan Kode Teks di atas atau unduh file soal.</div>";
+              alert("✓ Sukses! Kode Ujian berhasil di-generate (QR Code offline dilewati karena ukuran terlalu besar).");
+            }
+          }
+        } else {
+          // Fallback: Tampilkan QR Code offline (Base64) jika offline atau gagal upload
+          try {
+            qrContainer.innerHTML = "";
+            new QRCode(qrContainer, {
+              text: base64Code,
+              width: 200,
+              height: 200,
+              correctLevel: QRCode.CorrectLevel.M
+            });
+            const qrDesc = document.querySelector(".qr-desc");
+            if (qrDesc) qrDesc.innerHTML = "PINDAI UNTUK MULAI UJIAN (OFFLINE QR)";
+            alert("✓ Sukses! Kode Ujian & QR Code Ujian berhasil di-generate.");
+          } catch (e) {
+            qrContainer.innerHTML = "<div style='color:var(--color-danger); font-size:11px; padding: 15px; font-weight: bold;'>Soal terlalu panjang untuk QR Code offline.<br>Silakan gunakan Kode Teks di atas atau unduh file soal.</div>";
+            alert("✓ Sukses! Kode Ujian berhasil di-generate (QR Code offline dilewati karena ukuran terlalu besar).");
+          }
+        }
+
+        // PUSH entry ke localExams dan simpan ke localStorage
+        localExams.push(newExamEntry);
+        localStorage.setItem("local_exams_db", JSON.stringify(localExams));
+
+      } catch (err) {
+        alert("Terjadi kesalahan saat membuat kode ujian:\n" + err.message + "\n" + err.stack);
+      }
+    }
+
+    // --- DAFTAR UJIAN (EXAMS LIST) MANAGER FUNCTIONS ---
+    function refreshTeacherExamsTable() {
+      const exams = getLocalExams();
+      const tbody = document.getElementById("tableExamsBody");
+      if (!tbody) return;
+      tbody.innerHTML = "";
+
+      // Filter exams based on logged-in teacher (unless Admin)
+      const filteredExams = exams.filter(e => {
+        if (!activeTeacher || activeTeacher.isAdmin) return true;
+        return (e.teacher || "Umum").toLowerCase() === activeTeacher.name.toLowerCase();
+      });
+
+      if (filteredExams.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--color-muted);">Belum ada data ujian yang dibuat.</td></tr>`;
         return;
       }
 
-      const subjectName = document.getElementById("examSubjectInput").value.trim() || "Umum";
-      const teacherName = document.getElementById("examTeacherInput").value.trim() || "Umum";
-      localStorage.setItem("cfg_teacher_name", teacherName);
+      // Render descending order (newest first)
+      const reversedExams = [...filteredExams].reverse();
 
-      // Sisipkan setelan sinkronisasi database online milik guru ke dalam kode ujian!
-      const syncConfig = {
-        mode: localStorage.getItem("cfg_sync_mode") || "offline",
-        url: localStorage.getItem("cfg_supabase_url") || "",
-        key: localStorage.getItem("cfg_supabase_key") || ""
-      };
+      reversedExams.forEach(e => {
+        const tr = document.createElement("tr");
+        
+        // Count questions
+        const qCount = Array.isArray(e.questions) ? e.questions.length : 0;
+        
+        // Format Anti-Cheat
+        const cheatText = e.cheatLimit && e.cheatLimit > 0 ? `${e.cheatLimit}x Keluar` : "Tanpa Batas";
+        
+        // Format PIN
+        const pinText = e.pin ? `🔑 ${e.pin}` : "Bebas PIN";
+        
+        tr.innerHTML = `
+          <td><b>${e.subject || 'Umum'}</b></td>
+          <td>${e.teacher || 'Umum'}</td>
+          <td>${qCount} Soal</td>
+          <td>${cheatText}</td>
+          <td>${pinText}</td>
+          <td style="color:var(--color-muted);">${e.created_at || '-'}</td>
+          <td style="text-align: center;">
+            <div style="display: flex; gap: 6px; justify-content: center; flex-wrap: wrap;">
+              <button class="btn-action btn-action-primary" onclick="showExamDetailsFromList('${e.id}')" style="padding: 6px 12px; font-size: 11px; max-width: 120px; font-family: var(--font-body);">👁️ Lihat QR & Kode</button>
+              <button class="btn-action btn-action-secondary" onclick="reuseExamFromList('${e.id}')" style="padding: 6px 12px; font-size: 11px; max-width: 110px; background-color: #3b82f6; color:#fff; font-family: var(--font-body);">🔄 Gunakan Kembali</button>
+              <button class="btn-action" onclick="deleteExamFromList('${e.id}')" style="padding: 6px 12px; font-size: 11px; max-width: 80px; background-color: var(--color-danger); color: #fff; font-family: var(--font-body);">🗑️ Hapus</button>
+            </div>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
 
-      const examPayload = {
-        questions: parsedWordQuestions,
-        sync: syncConfig,
-        subject: subjectName,
-        teacher: teacherName
-      };
+    function closeExamCodeDetailsModal() {
+      document.getElementById("modalExamCodeDetails").classList.remove("active");
+    }
 
-      const jsonString = JSON.stringify(examPayload);
-      const base64Code = btoa(unescape(encodeURIComponent(jsonString)));
+    function showExamDetailsFromList(examId) {
+      const exams = getLocalExams();
+      const exam = exams.find(e => e.id === examId);
+      if (!exam) {
+        alert("Data ujian tidak ditemukan!");
+        return;
+      }
 
-      document.getElementById("txtOutputExamCode").value = base64Code;
-      document.getElementById("examCodeOutputArea").style.display = "block";
+      document.getElementById("mdExamTitle").innerText = exam.subject || "Umum";
+      document.getElementById("mdExamSubtitle").innerText = `Dibuat oleh: ${exam.teacher || "Umum"} pada ${exam.created_at || "-"}`;
+      document.getElementById("mdOutputExamCode").value = exam.code || "";
 
-      const qrContainer = document.getElementById("qrcodeSoalGuru");
+      const qrContainer = document.getElementById("mdQrcodeSoal");
       qrContainer.innerHTML = "⏳ Menyiapkan QR Code...";
 
-      // Jika menggunakan database online (hybrid), unggah ke Supabase untuk mendapatkan QR Code berisi link yang sangat pendek & mudah discan
-      if (syncConfig.mode === "hybrid" && syncConfig.url && syncConfig.key) {
-        try {
-          const res = await fetch(`${syncConfig.url}/rest/v1/exams`, {
-            method: "POST",
-            headers: {
-              "apikey": syncConfig.key,
-              "Authorization": `Bearer ${syncConfig.key}`,
-              "Content-Type": "application/json",
-              "Prefer": "return=representation"
-            },
-            body: JSON.stringify({
-              questions: parsedWordQuestions,
-              sync: syncConfig,
-              subject: subjectName,
-              teacher: teacherName
-            })
-          });
+      // Open Modal
+      document.getElementById("modalExamCodeDetails").classList.add("active");
 
-          if (!res.ok) throw new Error("Gagal mengunggah soal");
-          const data = await res.json();
-          const examId = data[0].id;
-          
-          // Generate QR Code berisi Link Ujian Siswa (Sangat Pendek & Mudah Di-scan dari jauh!)
-          const studentUrl = `https://qirif13.github.io/APPUJIANS/SchoolPortalSiswa/?exam_id=${examId}`;
-          
-          qrContainer.innerHTML = "";
+      // Check if we can show Online Link QR or offline Base64 QR
+      if (exam.supabase_id) {
+        const studentUrl = `https://qirif13.github.io/APPUJIANS/SchoolPortalSiswa/?exam_id=${exam.supabase_id}`;
+        qrContainer.innerHTML = "";
+        try {
           new QRCode(qrContainer, {
             text: studentUrl,
             width: 200,
             height: 200,
             correctLevel: QRCode.CorrectLevel.M
           });
+          document.getElementById("mdQrDesc").innerHTML = "PINDAI UNTUK MULAI UJIAN (ONLINE QR)";
+        } catch (e) {
+          console.error(e);
+        }
+      } else {
+        // Fallback Base64 offline QR
+        qrContainer.innerHTML = "";
+        try {
+          new QRCode(qrContainer, {
+            text: exam.code || "",
+            width: 200,
+            height: 200,
+            correctLevel: QRCode.CorrectLevel.M
+          });
+          document.getElementById("mdQrDesc").innerHTML = "PINDAI UNTUK MULAI UJIAN (OFFLINE QR)";
+        } catch (e) {
+          qrContainer.innerHTML = "<div style='color:var(--color-danger); font-size:11px; padding: 15px; font-weight: bold;'>Soal terlalu panjang untuk QR Code offline.<br>Silakan salin Kode Teks di atas.</div>";
+          document.getElementById("mdQrDesc").innerHTML = "QR CODE OFFLINE TIDAK DAPAT DIBUAT";
+        }
+      }
+    }
 
-          const qrDesc = document.querySelector(".qr-desc");
-          if (qrDesc) qrDesc.innerHTML = "PINDAI UNTUK MULAI UJIAN (ONLINE QR)";
-          alert("✓ Sukses! Soal ujian berhasil diunggah ke database. QR Code Link telah dibuat.");
-          return;
-        } catch (err) {
-          console.warn("Gagal membuat QR Online, menggunakan fallback QR offline:", err);
+    function copyExamCodeFromModal() {
+      const input = document.getElementById("mdOutputExamCode");
+      input.select();
+      input.setSelectionRange(0, 99999);
+      document.execCommand("copy");
+      alert("Kode Ujian berhasil disalin ke clipboard!");
+    }
+
+    function serializeQuestionsToText(questions) {
+      if (!Array.isArray(questions)) return "";
+      return questions.map(q => {
+        let text = `${q.no}. ${q.pertanyaan}\n`;
+        if (q.options) {
+          ["A", "B", "C", "D", "E"].forEach(opt => {
+            if (q.options[opt]) {
+              text += `${opt}. ${q.options[opt]}\n`;
+            }
+          });
+        }
+        if (q.kunci) {
+          text += `Kunci: ${q.kunci}\n`;
+        }
+        return text;
+      }).join("\n");
+    }
+
+    function reuseExamFromList(examId) {
+      const exams = getLocalExams();
+      const exam = exams.find(e => e.id === examId);
+      if (!exam) {
+        alert("Data ujian tidak ditemukan!");
+        return;
+      }
+
+      document.getElementById("examSubjectInput").value = exam.subject || "";
+      document.getElementById("examTeacherInput").value = exam.teacher || "";
+      document.getElementById("examCheatLimitInput").value = exam.cheatLimit || 0;
+      document.getElementById("examUnlockPinInput").value = exam.pin || "";
+
+      const restoredText = serializeQuestionsToText(exam.questions);
+      document.getElementById("wordInputText").value = restoredText;
+      
+      // trigger parser input handler
+      onWordTextInput();
+
+      // Sembunyikan output area lama agar guru tidak bingung
+      document.getElementById("examCodeOutputArea").style.display = "none";
+
+      // switch tab
+      switchTeacherTab('import');
+      alert(`✓ Berhasil memuat ulang soal ujian "${exam.subject || 'Umum'}". Anda sekarang dapat mengedit dan menerbitkan kembali.`);
+    }
+
+    async function deleteExamFromList(examId) {
+      const exams = getLocalExams();
+      const index = exams.findIndex(e => e.id === examId);
+      if (index === -1) {
+        alert("Ujian tidak ditemukan!");
+        return;
+      }
+
+      const exam = exams[index];
+      if (!confirm(`Apakah Anda yakin ingin menghapus ujian "${exam.subject || 'Umum'}"?\nData yang dihapus tidak dapat dipulihkan.`)) {
+        return;
+      }
+
+      // Jika ada supabase_id dan mode hybrid, hapus dari Supabase secara asinkron
+      if (exam.supabase_id && syncMode === "hybrid" && supabaseUrl && supabaseKey) {
+        try {
+          fetch(`${supabaseUrl}/rest/v1/exams?id=eq.${exam.supabase_id}`, {
+            method: "DELETE",
+            headers: {
+              "apikey": supabaseKey,
+              "Authorization": `Bearer ${supabaseKey}`
+            }
+          }).then(res => {
+            if (res.ok) {
+              console.log("Berhasil menghapus ujian dari Supabase online");
+            } else {
+              console.warn("Gagal menghapus ujian dari Supabase: " + res.status);
+            }
+          }).catch(err => {
+            console.warn("Gagal menghubungi Supabase untuk penghapusan:", err);
+          });
+        } catch (e) {
+          console.warn(e);
         }
       }
 
-      // Fallback: Tampilkan QR Code offline (Base64) jika offline atau gagal upload
+      // Hapus dari array lokal
+      exams.splice(index, 1);
+      localStorage.setItem("local_exams_db", JSON.stringify(exams));
+
+      // Refresh table
+      refreshTeacherExamsTable();
+      alert("Ujian berhasil dihapus.");
+    }
+
+    async function syncExamsFromSupabase() {
+      if (syncMode !== "hybrid" || !supabaseUrl || !supabaseKey) return 0;
+
       try {
-        qrContainer.innerHTML = "";
-        new QRCode(qrContainer, {
-          text: base64Code,
-          width: 200,
-          height: 200,
-          correctLevel: QRCode.CorrectLevel.M
+        const res = await fetch(`${supabaseUrl}/rest/v1/exams`, {
+          method: "GET",
+          headers: {
+            "apikey": supabaseKey,
+            "Authorization": `Bearer ${supabaseKey}`,
+            "Content-Type": "application/json"
+          }
         });
-        const qrDesc = document.querySelector(".qr-desc");
-        if (qrDesc) qrDesc.innerHTML = "PINDAI UNTUK MULAI UJIAN (OFFLINE QR)";
-        alert("✓ Sukses! Kode Ujian & QR Code Ujian berhasil di-generate.");
-      } catch (e) {
-        qrContainer.innerHTML = "<div style='color:var(--color-danger); font-size:11px; padding: 15px; font-weight: bold;'>Soal terlalu panjang untuk QR Code offline.<br>Silakan gunakan Kode Teks di atas atau unduh file soal.</div>";
-        alert("✓ Sukses! Kode Ujian berhasil di-generate (QR Code offline dilewati karena ukuran terlalu besar).");
+
+        if (!res.ok) throw new Error(`HTTP Error: ${res.status}`);
+
+        const data = await res.json();
+        if (!Array.isArray(data)) return 0;
+
+        const localExams = getLocalExams();
+        let addedCount = 0;
+
+        data.forEach(item => {
+          // Cek apakah ujian ini sudah ada di lokal
+          const isExist = localExams.some(e => 
+            e.supabase_id === item.id || 
+            (e.subject && e.subject.toLowerCase() === (item.subject || "").toLowerCase() &&
+             e.teacher && e.teacher.toLowerCase() === (item.teacher || "").toLowerCase() &&
+             JSON.stringify(e.questions) === JSON.stringify(item.questions))
+          );
+
+          if (!isExist) {
+            // Generate base64 payload
+            let code = "";
+            try {
+              const examPayload = {
+                questions: item.questions,
+                sync: item.sync || { mode: "hybrid", url: supabaseUrl, key: supabaseKey, cheatLimit: 0, unlockPinHash: "" },
+                subject: item.subject || "Umum",
+                teacher: item.teacher || "Umum",
+                cheatLimit: (item.sync && item.sync.cheatLimit) || 0,
+                unlockPinHash: (item.sync && item.sync.unlockPinHash) || ""
+              };
+              code = safeBase64Encode(JSON.stringify(examPayload));
+            } catch (err) {}
+
+            localExams.push({
+              id: "exam_online_" + item.id,
+              subject: item.subject || "Umum",
+              teacher: item.teacher || "Umum",
+              created_at: item.created_at ? new Date(item.created_at).toLocaleString("id-ID") : new Date().toLocaleString("id-ID"),
+              questions: item.questions,
+              code: code,
+              cheatLimit: (item.sync && item.sync.cheatLimit) || 0,
+              pin: "", // password PIN tidak langsung disinkronisasi dalam bentuk plain text
+              supabase_id: item.id
+            });
+            addedCount++;
+          }
+        });
+
+        if (addedCount > 0) {
+          localStorage.setItem("local_exams_db", JSON.stringify(localExams));
+          if (document.getElementById("tContentExams").classList.contains("active")) {
+            refreshTeacherExamsTable();
+          }
+          console.log(`[Supabase Exams Sync] Synced ${addedCount} new exams.`);
+        }
+
+        return addedCount;
+      } catch (err) {
+        console.error("[Supabase Exams Sync Error]", err);
+        return 0;
       }
     }
 
@@ -1348,7 +2365,7 @@ Kunci: A</pre>
 
     // --- CSV EXPORTER ---
     function exportScoresCsv() {
-      const scores = JSON.parse(localStorage.getItem("local_grades_db") || "[]");
+      const scores = getLocalGrades();
       if (scores.length === 0) {
         alert("Tidak ada data nilai untuk diekspor!");
         return;
@@ -1369,10 +2386,11 @@ Kunci: A</pre>
 
       // Gunakan sep=, agar Excel otomatis memisah kolom pada semua regional setting
       let csvContent = "data:text/csv;charset=utf-8,sep=,\r\n";
-      csvContent += "Nama Siswa,Kelas,Mata Pelajaran,Guru / Pengawas,Benar,Total Soal,Skor,Waktu Rekam\n";
+      csvContent += "Nama Siswa,Kelas,Mata Pelajaran,Guru / Pengawas,Benar,Total Soal,Skor,Pelanggaran,Waktu Rekam\n";
 
       filteredScores.forEach(s => {
-        csvContent += `"${s.name}","${s.cls}","${s.subject || 'Umum'}","${s.teacher || 'Umum'}",${s.correct},${s.total},${s.score},"${s.time}"\n`;
+        const cheatVal = s.cheatCount !== undefined ? s.cheatCount : 0;
+        csvContent += `"${s.name}","${s.cls}","${s.subject || 'Umum'}","${s.teacher || 'Umum'}",${s.correct},${s.total},${s.score},${cheatVal},"${s.time}"\n`;
       });
 
       const encodedUri = encodeURI(csvContent);
@@ -1382,6 +2400,169 @@ Kunci: A</pre>
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+    }
+
+    // --- GURU: TEACHER PROFILE / ACCOUNT MANAGER FUNCTIONS ---
+    function getLocalTeachers() {
+      try {
+        const stored = localStorage.getItem("local_teachers_db");
+        return stored ? JSON.parse(stored) : [];
+      } catch (e) {
+        console.warn("Resetting corrupted local_teachers_db:", e);
+        return [];
+      }
+    }
+
+    function populateLoginTeacherDropdown() {
+      // Empty shell to prevent undefined calls at launch
+    }
+
+    function onLoginTeacherSelectChange() {
+      // Empty shell
+    }
+
+    function selectLoginMode(mode) {
+      const hiddenInput = document.getElementById("loginTeacherSelect");
+      if (hiddenInput) {
+        hiddenInput.value = mode;
+      }
+
+      const cardAdmin = document.getElementById("cardLoginAdmin");
+      const cardTeacher = document.getElementById("cardLoginTeacher");
+      const groupName = document.getElementById("groupLoginTeacherName");
+      const lblPin = document.getElementById("lblLoginPin");
+      const btnSubmit = document.getElementById("btnSubmitLogin");
+
+      if (mode === "admin") {
+        if (cardAdmin) cardAdmin.classList.add("active");
+        if (cardTeacher) cardTeacher.classList.remove("active");
+        if (groupName) groupName.style.display = "none";
+        if (lblPin) lblPin.innerText = "PIN Pengawas (Master)";
+        if (btnSubmit) btnSubmit.innerText = "Masuk Dashboard";
+      } else {
+        if (cardAdmin) cardAdmin.classList.remove("active");
+        if (cardTeacher) cardTeacher.classList.add("active");
+        if (groupName) groupName.style.display = "block";
+        if (lblPin) lblPin.innerText = "PIN Guru / Pengawas";
+        if (btnSubmit) btnSubmit.innerText = "Masuk / Daftar Akun";
+      }
+
+      // Clear fields
+      document.getElementById("loginPinField").value = "";
+      const nameField = document.getElementById("loginTeacherNameField");
+      if (nameField) nameField.value = "";
+
+      // Focus field
+      setTimeout(() => {
+        if (mode === "admin") {
+          document.getElementById("loginPinField").focus();
+        } else {
+          if (nameField) nameField.focus();
+        }
+      }, 100);
+    }
+
+    function onTeacherLoginSuccess() {
+      navigateToScreen("screenTeacherDashboard");
+      
+      const indicator = document.getElementById("txtTeacherProfileIndicator");
+      if (indicator) {
+        if (activeTeacher.isAdmin) {
+          indicator.innerHTML = `Profil: <b style="color:var(--color-warning);">Admin / Super-user</b>`;
+        } else {
+          indicator.innerHTML = `Profil: <b>${activeTeacher.name}</b>`;
+        }
+      }
+
+      const examTeacherInput = document.getElementById("examTeacherInput");
+      if (examTeacherInput) {
+        if (activeTeacher.isAdmin) {
+          examTeacherInput.value = localStorage.getItem("cfg_teacher_name") || "";
+          examTeacherInput.readOnly = false;
+        } else {
+          examTeacherInput.value = activeTeacher.name;
+          examTeacherInput.readOnly = true;
+        }
+      }
+
+      refreshTeacherScoresTable();
+      refreshTeacherExamsTable();
+      renderDashboardCharts();
+
+      if (!activeTeacher.isAdmin) {
+        const filterTeacherSelect = document.getElementById("filterTeacherSelect");
+        if (filterTeacherSelect) {
+          let optionExists = Array.from(filterTeacherSelect.options).some(o => o.value.toLowerCase() === activeTeacher.name.toLowerCase());
+          if (!optionExists) {
+            const opt = document.createElement("option");
+            opt.value = activeTeacher.name;
+            opt.innerText = activeTeacher.name;
+            filterTeacherSelect.appendChild(opt);
+          }
+          filterTeacherSelect.value = activeTeacher.name;
+          filterTeacherSelect.disabled = true;
+          
+          refreshTeacherScoresTable();
+          renderDashboardCharts();
+        }
+      } else {
+        const filterTeacherSelect = document.getElementById("filterTeacherSelect");
+        if (filterTeacherSelect) {
+          filterTeacherSelect.disabled = false;
+        }
+      }
+
+      if (syncMode === "hybrid" && supabaseUrl && supabaseKey) {
+        startAutoSyncInterval();
+      }
+    }
+
+    async function syncTeachersFromSupabase() {
+      if (syncMode !== "hybrid" || !supabaseUrl || !supabaseKey) return 0;
+
+      try {
+        const res = await fetch(`${supabaseUrl}/rest/v1/teachers`, {
+          method: "GET",
+          headers: {
+            "apikey": supabaseKey,
+            "Authorization": `Bearer ${supabaseKey}`,
+            "Content-Type": "application/json"
+          }
+        });
+
+        if (!res.ok) {
+          return 0;
+        }
+
+        const data = await res.json();
+        if (!Array.isArray(data)) return 0;
+
+        const localTeachers = getLocalTeachers();
+        let addedCount = 0;
+
+        data.forEach(item => {
+          const isExist = localTeachers.some(t => t.name.toLowerCase() === item.name.toLowerCase());
+          if (!isExist) {
+            localTeachers.push({
+              id: item.id || "teacher_online_" + Math.random().toString(36).substr(2, 9),
+              name: item.name,
+              pin_hash: item.pin_hash
+            });
+            addedCount++;
+          }
+        });
+
+        if (addedCount > 0) {
+          localStorage.setItem("local_teachers_db", JSON.stringify(localTeachers));
+          populateLoginTeacherDropdown();
+          console.log(`[Supabase Teachers Sync] Synced ${addedCount} new teacher accounts.`);
+        }
+
+        return addedCount;
+      } catch (err) {
+        console.warn("[Supabase Teachers Sync Error]", err);
+        return 0;
+      }
     }
   </script>
 </body>
